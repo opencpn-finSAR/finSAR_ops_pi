@@ -62,7 +62,7 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin *p) { delete p; }
 //
 //---------------------------------------------------------------------------------------------------------
 
-finSAR_ops_pi::finSAR_ops_pi(void *ppimgr) : opencpn_plugin_117(ppimgr) {
+finSAR_ops_pi::finSAR_ops_pi(void *ppimgr) : opencpn_plugin_118(ppimgr) {
   // Create the PlugIn icons
   initialize_images();
 
