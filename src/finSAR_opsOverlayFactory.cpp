@@ -148,12 +148,34 @@ bool finSAR_opsOverlayFactory::RenderOverlay(piDC &dc, PlugIn_ViewPort &vp) {
 
   DrawIndexTargets(&vp);
 
+  if (m_dlg.m_bDrawWptDisk) DrawWptDisk(&vp);
+
   if (m_dlg.m_bBearingLine) {
     DrawEBLLineInViewPort(&vp);
   } else
     return false;
 
   return true;
+}
+
+void finSAR_opsOverlayFactory::DrawWptDisk(PlugIn_ViewPort *BBox) {
+  wxColour colour = wxColour("RED");
+  wxBrush brush(colour);
+  c_GLcolour = colour;  // for filling GL arrows
+  if (m_dc) {
+    wxPen pen(colour, 2);
+
+    m_dc->SetPen(pen);
+    brush.SetStyle(wxBRUSHSTYLE_SOLID);
+    m_dc->SetBrush(brush);
+  }
+
+  wxPoint wpc;
+  GetCanvasPixLL(BBox, &wpc, m_dlg.active_wp_lat, m_dlg.active_wp_lon);
+
+  if (m_dc) {
+    m_dc->DrawDisk(wpc.x, wpc.y, 5, 15);
+  }
 }
 
 void finSAR_opsOverlayFactory::DrawEBLLineInViewPort(PlugIn_ViewPort *BBox) {
@@ -200,7 +222,8 @@ void finSAR_opsOverlayFactory::DrawIndexTargets(PlugIn_ViewPort *BBox) {
   }
 }
 
-void finSAR_opsOverlayFactory::DrawBearingLineInViewPort(PlugIn_ViewPort *BBox) {
+void finSAR_opsOverlayFactory::DrawBearingLineInViewPort(
+    PlugIn_ViewPort *BBox) {
   wxColour colour = wxColour("RED");
   wxBrush brush(colour);
   c_GLcolour = colour;  // for filling GL arrows
@@ -282,8 +305,8 @@ void finSAR_opsOverlayFactory::DrawAllLinesInViewPort(PlugIn_ViewPort *BBox) {
 }
 
 void finSAR_opsOverlayFactory::DrawGLLine(double x1, double y1, double x2,
-                                          double y2, double width,
-                                          wxColour myColour) {
+                                           double y2, double width,
+                                           wxColour myColour) {
   {
     wxColour isoLineColor = myColour;
     glColor4ub(isoLineColor.Red(), isoLineColor.Green(), isoLineColor.Blue(),
@@ -312,9 +335,8 @@ void finSAR_opsOverlayFactory::DrawGLLine(double x1, double y1, double x2,
   }
 }
 
-
 void finSAR_opsOverlayFactory::DrawMessageWindow(wxString msg, int x, int y,
-                                               wxFont *mfont) {
+                                                  wxFont *mfont) {
   if (msg.empty()) return;
 
   wxMemoryDC mdc;
@@ -534,7 +556,7 @@ wxImage &finSAR_opsOverlayFactory::DrawGLTextString(wxString myText) {
 }
 
 void finSAR_opsOverlayFactory::DrawOLBitmap(const wxBitmap &bitmap, wxCoord x,
-                                          wxCoord y, bool usemask) {
+                                             wxCoord y, bool usemask) {
   wxBitmap bmp;
   if (x < 0 || y < 0) {
     int dx = (x < 0 ? -x : 0);
@@ -603,10 +625,10 @@ void finSAR_opsOverlayFactory::DrawOLBitmap(const wxBitmap &bitmap, wxCoord x,
   }
 }
 
-void finSAR_opsOverlayFactory::DrawGLLabels(finSAR_opsOverlayFactory *pof, wxDC *dc,
-                                          PlugIn_ViewPort *vp,
-                                          wxImage &imageLabel, double myLat,
-                                          double myLon, int offset) {
+void finSAR_opsOverlayFactory::DrawGLLabels(finSAR_opsOverlayFactory *pof,
+                                             wxDC *dc, PlugIn_ViewPort *vp,
+                                             wxImage &imageLabel, double myLat,
+                                             double myLon, int offset) {
   //---------------------------------------------------------
   // Ecrit les labels
   //---------------------------------------------------------
@@ -792,9 +814,10 @@ wxImage &finSAR_opsOverlayFactory::DrawGLPolygon() {
   */
 }
 void finSAR_opsOverlayFactory::drawGLPolygons(finSAR_opsOverlayFactory *pof,
-                                            wxDC *dc, PlugIn_ViewPort *vp,
-                                            wxImage &imageLabel, double myLat,
-                                            double myLon, int offset) {
+                                               wxDC *dc, PlugIn_ViewPort *vp,
+                                               wxImage &imageLabel,
+                                               double myLat, double myLon,
+                                               int offset) {
   //---------------------------------------------------------
   // Ecrit les labels
   //---------------------------------------------------------
@@ -956,14 +979,17 @@ void finSAR_opsOverlayFactory::DrawAllDirectionsInViewPort(
       m_dc->SetTextForeground("RED");
 
       snprintf(sbuf, 19, "%03.0f", print_dir);
-      m_dc->DrawRotatedText(wxString(sbuf, wxConvUTF8), pixxc, pixyc, print_dir);
+      m_dc->DrawRotatedText(wxString(sbuf, wxConvUTF8), pixxc, pixyc,
+                            print_dir);
     }
   }
 }
 
-bool finSAR_opsOverlayFactory::DrawDirectionArrow(int x, int y, double rot_angle,
-                                                double scale, double direction,
-                                                wxColour arrow_color) {
+bool finSAR_opsOverlayFactory::DrawDirectionArrow(int x, int y,
+                                                   double rot_angle,
+                                                   double scale,
+                                                   double direction,
+                                                   wxColour arrow_color) {
   // double m_rate = fabs(rate);
 
   wxColour colour;

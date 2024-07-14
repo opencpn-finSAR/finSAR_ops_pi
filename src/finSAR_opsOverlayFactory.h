@@ -131,6 +131,7 @@ private:
   double myLat1;
   double myLon1;
   void DrawAllLinesInViewPort(PlugIn_ViewPort *BBox);
+  void DrawWptDisk(PlugIn_ViewPort *BBox);
   void DrawEBLLineInViewPort(PlugIn_ViewPort *BBox);
   void DrawBearingLineInViewPort(PlugIn_ViewPort *BBox);
   void DrawIndexTargets(PlugIn_ViewPort *BBox);

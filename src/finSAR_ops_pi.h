@@ -34,12 +34,15 @@
 #include <wx/glcanvas.h>
 #endif  // precompiled headers
 
+#include <sqlite3.h>
 #include "ocpn_plugin.h"
 #include "finSAR_opsOverlayFactory.h"
 #include "finSAR_opsUIDialog.h"
 #include <wx/datetime.h>
 #include "pidc.h"
 #include <wx/tokenzr.h>
+
+#define DATABASE_NAME "finSAR.db"
 
 class piDC;
 class finSAR_opsUIDialog;
@@ -76,7 +79,7 @@ public:
   //    The override PlugIn Methods
   bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
   bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
-  void SetCursorLatLon(double lat, double lon);
+  //void SetCursorLatLon(double lat, double lon);
   void SetPositionFix(PlugIn_Position_Fix &pfix);
   void SetDefaults(void);
   int GetToolbarToolCount(void);
@@ -93,10 +96,12 @@ public:
   void SetColorScheme(PI_ColorScheme cs);
   double GetShipLon(void) { return m_ship_lon; }
   double GetShipLat(void) { return m_ship_lat; }
+  double GetShipCog(void) { return m_ship_cog; }
 
-  void OnContextMenuItemCallback(int id);
+  //void OnContextMenuItemCallback(int id);
+  void SetCursorLatLon(double lat, double lon);
 
-  bool MouseEventHook(wxMouseEvent &event);
+ // bool MouseEventHook(wxMouseEvent &event);
   void OnfinSAR_opsDialogClose();
 
   wxString GetFolderSelected() { return m_CopyFolderSelected; }
@@ -113,13 +118,39 @@ public:
   finSAR_opsOverlayFactory *m_pfinSAR_opsOverlayFactory;
 
   wxString StandardPath();
+  wxString StandardPathRTZ();
+
   finSAR_opsUIDialog *m_pfinSAR_opsDialog;
   void SetNMEASentence(wxString &sentence);
   wxString wp_Btw;
+
+  	// ******** Database stuff ******************************************
+
+  sqlite3 *m_database;
+  int ret;
+  char *err_msg;
+  bool b_dbUsable;
+
+  int Add_RTZ_db(wxString route_name);
+  int GetActiveFileDBId() { return m_activeFileDB; }
+  void SetActiveFileDBId(int id) { m_activeFileDB = id; }
   
+  int m_activeFileDB;
+
+  void DeleteRTZ_Id(int id);
+  void DeleteRTZ_Name(wxString route_name);
+  wxString m_activefiledbname;
+  int dbGetIntNotNullValue(wxString sql);
+  void dbGetTable(wxString sql, char ***results, int &n_rows, int &n_columns);
+  void dbFreeResults(char **results);
+  int GetRoute_Id(wxString route_name);
+  void FillRouteNamesDropdown();
+  wxArrayString GetRouteList();
 
 private:
   double m_cursor_lat, m_cursor_lon;
+  int m_position_menu_id;
+
   bool LoadConfig(void);
   bool SaveConfig(void);
 
@@ -146,12 +177,10 @@ private:
   int m_height;
 
   bool m_bShowfinSAR_ops;
-
-  int m_position_menu_id;
   int m_table_menu_id;
 
   wxBitmap m_panelBitmap;
-  double m_ship_lon, m_ship_lat;
+  double m_ship_lon, m_ship_lat, m_ship_cog;
 
   void SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info);
   wxString wp_name;
@@ -159,6 +188,8 @@ private:
   bool m_route_active;
   void SetPluginMessage(wxString &message_id, wxString &message_body);
   Plugin_Active_Leg_Info myleg_info;
+
+  bool dbQuery(wxString sql);
 };
 
 #endif

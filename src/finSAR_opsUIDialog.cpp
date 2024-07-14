@@ -52,7 +52,6 @@
 
 class ConfigurationDialog;
 class RouteProp;
-class treeCtrlRoutes;
 class Position;
 
 using namespace std;
@@ -158,14 +157,15 @@ finSAR_opsUIDialog::~finSAR_opsUIDialog() {
   if (pConf) {
     pConf->SetPath(_T ( "/PlugIns/finSAR_ops" ));
   }
+
   // SaveXML(m_default_configuration_path);
 }
-
+/*
 void finSAR_opsUIDialog::SetCursorLatLon(double lat, double lon) {
   m_cursor_lon = lon;
   m_cursor_lat = lat;
 }
-
+*/
 void finSAR_opsUIDialog::SetViewPort(PlugIn_ViewPort* vp) {
   if (m_vp == vp) return;
 
@@ -178,6 +178,7 @@ void finSAR_opsUIDialog::SetViewPort(PlugIn_ViewPort* vp) {
 
 void finSAR_opsUIDialog::OnClose(wxCloseEvent& event) {
   pPlugIn->OnfinSAR_opsDialogClose();
+  DeleteChartedRoute();
 }
 
 void finSAR_opsUIDialog::OnMove(wxMoveEvent& event) {
@@ -213,8 +214,6 @@ void finSAR_opsUIDialog::OnInformation(wxCommandEvent& event) {}
 void finSAR_opsUIDialog::GetTable(wxString myRoute) {}
 
 void finSAR_opsUIDialog::AddChartRoute(wxString myRoute) {}
-
-void finSAR_opsUIDialog::OnReadRTZ(wxCommandEvent& event) { ReadRTZ(); }
 
 int finSAR_opsUIDialog::GetRandomNumber(int range_min, int range_max) {
   long u = (long)wxRound(
@@ -417,87 +416,8 @@ void finSAR_opsUIDialog::AddTestItems(wxCommandEvent& event) {
   // wxMessageBox(my_areas[1].Item(0));
   // wxMessageBox(testca);
   // wxMessageBox(testcf);
-
-  AddAreas();
 }
 
-void finSAR_opsUIDialog::AddAreas() {
-  int image, imageSel;
-
-  // wxString testca = wxString::Format("%i", ca);
-  //  wxMessageBox(testca);
-/*
-  wxTreeItemId rootId = m_treeCtrlRoutes->AddRoot("Areas");
-
-  for (int area = 0; area < ca; area++) {
-    wxTreeItemId id;
-
-    id = m_treeCtrlRoutes->AppendItem(
-        rootId, my_areas[area].Item(0), image, imageSel,
-        new MyTreeItemData(my_areas[area].Item(0)));
-
-    wxTreeItemId fileId = m_treeCtrlRoutes->AppendItem(id, "files");
-
-    for (int f = 0; f < 10; f++) {
-      // for (int as = 0; as < 10; as++) {
-      if (my_files[area + 1][f].Item(1) != wxEmptyString) {
-        wxTreeItemId fid = m_treeCtrlRoutes->AppendItem(
-            fileId, my_files[area + 1][f].Item(1), image, imageSel,
-            new MyTreeItemData(my_files[area + 1][f].Item(1)));
-      }
-    }
-  }
-  */
-}
-/*
-void finSAR_opsUIDialog::OnBeginDrag(wxTreeEvent& event) {
-  // need to explicitly allow drag
-  if (event.GetItem() !=
-      pPlugIn->m_pfinSAR_opsDialog->m_treeCtrlRoutes->GetRootItem()) {
-    m_draggedItem = event.GetItem();
-
-    wxPoint clientpt = event.GetPoint();
-    wxPoint screenpt = ClientToScreen(clientpt);
-
-    // wxMessageBox("OnBeginDrag");
-
-    event.Allow();
-  } else {
-    wxMessageBox("OnBeginDrag: this item can't be dragged.");
-  }
-}
-
-void finSAR_opsUIDialog::OnEndDrag(wxTreeEvent& event) {
-  wxTreeItemId itemSrc = m_draggedItem, itemDst = event.GetItem();
-  m_draggedItem = (wxTreeItemId)0l;
-
-  // where to copy the item?
-  if (itemDst.IsOk() && !m_treeCtrlRoutes->ItemHasChildren(itemDst)) {
-    // copy to the parent then
-    itemDst = m_treeCtrlRoutes->GetItemParent(itemDst);
-  }
-  // wxMessageBox("OnEndDrag");
-  if (!itemDst.IsOk()) {
-    wxMessageBox("OnEndDrag: can't drop here.");
-
-    return;
-  }
-
-  wxString text = m_treeCtrlRoutes->GetItemText(itemSrc);
-
-  // wxMessageBox("OnEndDrag: '%s' copied", text);
-
-  // just do append here - we could also insert it just before/after the item
-  // on which it was dropped, but this requires slightly more work... we also
-  // completely ignore the client data and icon of the old item but could
-  // copy them as well.
-  //
-  // Finally, we only copy one item here but we might copy the entire tree if
-  // we were dragging a folder.
-
-  wxTreeItemId id = m_treeCtrlRoutes->AppendItem(itemDst, text, 1);
-}
-*/
 /*
 void finSAR_opsUIDialog::ChartTheRoute(wxString myRoute) {
   PlugIn_Route_Ex* newRoute =
@@ -516,32 +436,32 @@ void finSAR_opsUIDialog::ChartTheRoute(wxString myRoute) {
     wayPoint->m_MarkName = (*itp).wpName;
 
     //if (!(*itp).lat.ToDouble(&value)) { /* error! */
-    //}
-    //lati = value;
-    //if (!(*itp).lon.ToDouble(&value1)) { /* error! */
-   // }
-   // loni = value1;
+//}
+// lati = value;
+// if (!(*itp).lon.ToDouble(&value1)) { /* error! */
+// }
+// loni = value1;
 
-    /*
-    m_bNameVisible = (*itp).is_visible;
-    m_bNameVisible = true;
+/*
+m_bNameVisible = (*itp).is_visible;
+m_bNameVisible = true;
 
-    wayPoint->m_lat = lati;
-    wayPoint->m_lon = loni;
-    wayPoint->IsVisible = true;
-    //wayPoint->IsNameVisible = m_bNameVisible;
+wayPoint->m_lat = lati;
+wayPoint->m_lon = loni;
+wayPoint->IsVisible = true;
+//wayPoint->IsNameVisible = m_bNameVisible;
 
-    wayPoint->IconName = "diamond";
+wayPoint->IconName = "diamond";
 
-    newRoute->pWaypointList->Append(wayPoint);
-  }
+newRoute->pWaypointList->Append(wayPoint);
+}
 
-  AddPlugInRouteEx(newRoute, true);
+AddPlugInRouteEx(newRoute, true);
 
-  wxMessageBox("Route & Mark Manager will show the imported route",
-               "Imported Route");
+wxMessageBox("Route & Mark Manager will show the imported route",
+           "Imported Route");
 
-  GetParent()->Refresh();
+GetParent()->Refresh();
 }
 */
 int finSAR_opsUIDialog::GetScale(double myChartScale) {
@@ -774,15 +694,29 @@ void finSAR_opsUIDialog::MakeBoxPoints() {
 void finSAR_opsUIDialog::OnTimer(wxTimerEvent& event) { MakeEBLEvent(); }
 
 void finSAR_opsUIDialog::MakeEBLEvent() {
-    /*
   if (m_bBearingLine) {
     this->m_Lat1->SetValue(wxString::Format("%.6f", pPlugIn->GetCursorLat()));
     this->m_Lon1->SetValue(wxString::Format("%.6f", pPlugIn->GetCursorLon()));
 
     ebl_lat = pPlugIn->GetCursorLat();
     ebl_lon = pPlugIn->GetCursorLon();
-    m_ShipLat2 = pPlugIn->GetShipLat();
-    m_ShipLon2 = pPlugIn->GetShipLon();
+
+    double test_lat = pPlugIn->GetShipLat();
+
+    if (test_lat > 90.0) {
+      m_ShipLat2 = centreLat;
+      m_ShipLon2 = centreLon;
+
+    } else {
+      m_ShipLat2 = pPlugIn->GetShipLat();
+      m_ShipLon2 = pPlugIn->GetShipLon();
+    }
+
+    double dist1,brg1;
+    DistanceBearingMercator_Plugin(ebl_lat, ebl_lon, m_ShipLat2, m_ShipLon2, &brg1, &dist1);
+
+    this->m_EBLbearing->SetValue(wxString::Format("%5.1f", brg1));
+
   } else {
     ebl_lat = 0;
     ebl_lon = 0;
@@ -792,25 +726,320 @@ void finSAR_opsUIDialog::MakeEBLEvent() {
   }
 
   RequestRefresh(pParent);
-  */
 }
 
-void finSAR_opsUIDialog::OnLoadRTZ(wxCommandEvent& event) {
-  ReadRTZ();
-  //ChartTheRoute(mySelectedRoute);
+void finSAR_opsUIDialog::OnNewRoute(wxCommandEvent& event) {
+  // This sleep is needed to give the time for the currently pressed modifier
+  // keys, if any, to be released. Notice that Control modifier could well be
+  // pressed if this command was activated from the menu using accelerator
+  // and keeping it pressed would totally derail the test below, e.g. "A" key
+  // press would actually become "Ctrl+A" selecting the entire text and so on.
+
+  wxMessageBox(
+      "Press CTRL+R to enter route name\nPress \"End Route\" on completion");
+
+  pParent->SetFocus();
+  wxUIActionSimulator sim;
+  sim.KeyDown(82, wxMOD_CONTROL);
+
+  // sim.KeyUp(82, wxMOD_CONTROL);
+}
+
+void finSAR_opsUIDialog::OnSaveRoute(wxCommandEvent& event) {
+  // This sleep is needed to give the time for the currently pressed modifier
+  // keys, if any, to be released. Notice that Control modifier could well be
+  // pressed if this command was activated from the menu using accelerator
+  // and keeping it pressed would totally derail the test below, e.g. "A" key
+  // press would actually become "Ctrl+A" selecting the entire text and so on.
+
+  pPlugIn->m_pfinSAR_opsDialog->SetFocus();
+  wxUIActionSimulator sim;
+  sim.KeyUp(82, wxMOD_CONTROL);
+  //
+  //
+  std::vector<std::unique_ptr<PlugIn_Route_Ex>> routes;
+  auto uids = GetRouteGUIDArray();
+  for (size_t i = 0; i < uids.size(); i++) {
+    routes.push_back(std::move(GetRouteEx_Plugin(uids[i])));
+  }
+
+  GetRouteDialog RouteDialog(this, -1, _("Select the route to follow"),
+                             wxPoint(200, 200), wxSize(300, 200),
+                             wxCAPTION | wxRESIZE_BORDER);
+
+  RouteDialog.dialogText->InsertColumn(0, "", 0, wxLIST_AUTOSIZE);
+  RouteDialog.dialogText->SetColumnWidth(0, 290);
+  RouteDialog.dialogText->InsertColumn(1, "", 0, wxLIST_AUTOSIZE);
+  RouteDialog.dialogText->SetColumnWidth(1, 0);
+  RouteDialog.dialogText->DeleteAllItems();
+
+  int in = 0;
+  std::vector<std::string> names;
+  for (const auto& r : routes) names.push_back(r->m_NameString.ToStdString());
+
+  for (size_t n = 0; n < names.size(); n++) {
+    wxString routeName = names[in];
+    if (routeName == "") {
+      wxMessageBox(
+          "Please add name of route in \"Route->Properties\"\nand Press \"Save "
+          "Route\" again",
+          "Missing Name");
+      return;
+    }
+    RouteDialog.dialogText->InsertItem(in, "", -1);
+    RouteDialog.dialogText->SetItem(in, 0, routeName);
+    in++;
+  }
+
+  // ReadNavobj();
+  long si = -1;
+  long itemIndex = -1;
+  // int f = 0;
+
+  wxListItem row_info;
+  wxString cell_contents_string = wxEmptyString;
+  bool foundRoute = false;
+
+  if (RouteDialog.ShowModal() != wxID_OK) {
+    wxMessageBox("Cancelled");
+  } else {
+    for (;;) {
+      itemIndex = RouteDialog.dialogText->GetNextItem(
+          itemIndex, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+
+      if (itemIndex == -1) break;
+
+      // Got the selected item index
+      if (RouteDialog.dialogText->IsSelected(itemIndex)) {
+        si = itemIndex;
+        foundRoute = true;
+        break;
+      }
+    }
+
+    if (foundRoute) {
+      // Set what row it is (m_itemId is a member of the regular
+      // wxListCtrl class)
+      row_info.m_itemId = si;
+      // Set what column of that row we want to query for information.
+      row_info.m_col = 0;
+      // Set text mask
+      row_info.m_mask = wxLIST_MASK_TEXT;
+
+      // Get the info and store it in row_info variable.
+      RouteDialog.dialogText->GetItem(row_info);
+      // Extract the text out that cell
+      cell_contents_string = row_info.m_text;
+      rtept initPoint;
+      nextRoutePointIndex = 0;
+      bool foundRoute = false;
+      wxString myGuid;
+
+      for (size_t i = 0; i < uids.size(); i++) {
+        thisRoute = GetRouteEx_Plugin(uids[i]);
+        if (thisRoute->m_NameString == cell_contents_string) {
+          myGuid = uids[i];
+          foundRoute = true;
+          break;
+        }
+      }
+
+      if (foundRoute) {
+        countRoutePoints = thisRoute->pWaypointList->size();
+        myList = thisRoute->pWaypointList;
+
+        PlugIn_Waypoint_Ex* myWaypoint;
+        theWaypoints.clear();
+        // Trying to remove the route by deleting the waypoints
+        // Plugin_WaypointExList* temp_list;
+
+        wxPlugin_WaypointExListNode* pwpnode = myList->GetFirst();
+        while (pwpnode) {
+          myWaypoint = pwpnode->GetData();
+          theWaypoints.push_back(myWaypoint);
+          // temp_list->Append(myWaypoint);
+          pwpnode = pwpnode->GetNext();
+        }
+
+        WriteRTZ(thisRoute->m_NameString);
+
+        wxString rtz_file = thisRoute->m_NameString + ".rtz";
+        // wxMessageBox(rtz_file);
+
+        int id = pPlugIn->GetRoute_Id(rtz_file);
+        // wxString sid = wxString::Format("%i", id);
+        // wxMessageBox(sid);
+        if (id != 0) pPlugIn->DeleteRTZ_Id(id);
+        // Now add the modified route
+        pPlugIn->Add_RTZ_db(rtz_file);
+
+        /*
+        temp_list->DeleteContents(true);
+        temp_list->Clear();
+
+        thisRoute->pWaypointList->Clear();  // no-longer-managed object
+        thisRoute->pWaypointList->delete()(thisRoute->pWaypointList);
+        */
+        DeletePlugInRoute(myGuid);
+        pPlugIn->FillRouteNamesDropdown();
+        //
+      } else
+        wxMessageBox("Route not found");
+    }
+  }
+  RequestRefresh(pParent);
+}
+
+void finSAR_opsUIDialog::WriteRTZ(wxString route_name) {
+  // Select the route from the route table
+  //
+  // Create Main level XML container
+  xml_document xmlDoc;
+
+  auto declarationNode = xmlDoc.append_child(node_declaration);
+
+  declarationNode.append_attribute("version") = "1.0";
+
+  declarationNode.append_attribute("encoding") = "UTF-8";
+
+  const char* value = "http://www.cirm.org/RTZ/1/2";
+
+  // Create XML root node called animals
+  xml_node pRoot = xmlDoc.append_child("route");
+
+  pRoot.append_attribute("xmlns").set_value(value);
+  pRoot.append_attribute("xmlns:xsi")
+      .set_value("http://www.w3.org/2001/XMLSchema-instance");
+
+  pRoot.append_attribute("version").set_value("1.2");
+
+  // ************* Add routeInfo to root node *******
+
+  xml_node routeInfo = pRoot.append_child("routeInfo");
+  routeInfo.append_attribute("routeName").set_value(route_name.mb_str());
+
+  // Insert cat's name as first child of animal
+
+  // ************* Add waypoints *******
+  xml_node waypoints = pRoot.append_child("waypoints");
+
+  for (std::vector<PlugIn_Waypoint_Ex*>::iterator itOut = theWaypoints.begin();
+       itOut != theWaypoints.end(); itOut++) {
+    xml_node m_waypoint = waypoints.append_child("waypoint");
+
+    m_waypoint.append_attribute("id").set_value((*itOut)->m_MarkName.mb_str());
+    m_waypoint.append_attribute("name").set_value(
+        (*itOut)->m_MarkName.mb_str());
+    m_waypoint.append_attribute("revision").set_value("0");
+
+    xml_node position = m_waypoint.append_child("position");
+    double dLat = (*itOut)->m_lat;
+    double dLon = (*itOut)->m_lon;
+    wxString sLat = wxString::Format("%f", dLat);
+    wxString sLon = wxString::Format("%f", dLon);
+
+    position.append_attribute("lat").set_value(sLat);
+    position.append_attribute("lon").set_value(sLon);
+  }
+  // done adding waypoints
+  // Write xmlDoc into a file
+
+  wxString file_name = route_name + ".rtz";
+  wxString file_path = pPlugIn->StandardPathRTZ() + file_name;
+
+  // wxMessageBox(file_path);
+
+  // Route name must be the same as the file name, without file extension
+
+  xmlDoc.save_file(file_path.mb_str());
+}
+
+void finSAR_opsUIDialog::OnLoadRoute(wxCommandEvent& event) {
+  int c = pPlugIn->m_pfinSAR_opsDialog->m_choiceRoutes->GetSelection();
+  wxString rt = pPlugIn->m_pfinSAR_opsDialog->m_choiceRoutes->GetString(c);
+  if (rt == "dummy") {
+    wxMessageBox("No routes available", "No Routes");
+    return;
+  }
+  wxString file_folder = pPlugIn->StandardPathRTZ();
+  wxString file_name = file_folder + rt + ".rtz";
+  m_textCtrlRouteInUse->SetValue(rt);
+  // wxMessageBox(file_name);
+  ReadRTZ(file_name);
+  ChartTheRoute(rt);
   i_vector.clear();
 }
 
+void finSAR_opsUIDialog::ChartTheRoute(wxString myRoute) {
+  PlugIn_Route_Ex* newRoute =
+      new PlugIn_Route_Ex;  // for adding a route on OpenCPN chart display
+
+  newRoute->m_NameString = myRoute;
+  newRoute->m_isVisible = true;
+
+  double lati, loni, value, value1;
+  bool m_bNameVisible = true;
+
+  for (std::vector<Position>::iterator itp = my_positions.begin();
+       itp != my_positions.end(); itp++) {
+    PlugIn_Waypoint_Ex* wayPoint = new PlugIn_Waypoint_Ex;
+
+    wayPoint->m_MarkName = (*itp).wpName;
+
+    if (!(*itp).lat.ToDouble(&value)) { /* error! */
+    }
+    lati = value;
+    if (!(*itp).lon.ToDouble(&value1)) { /* error! */
+    }
+    loni = value1;
+
+    m_bNameVisible = true;
+    //(*itp).name_visible;
+
+    wayPoint->m_lat = lati;
+    wayPoint->m_lon = loni;
+    wayPoint->IsVisible = true;
+    wayPoint->IsNameVisible = m_bNameVisible;
+
+    wayPoint->IconName = "diamond";
+
+    newRoute->pWaypointList->Append(wayPoint);
+  }
+
+  AddPlugInRouteEx(newRoute, true);
+
+ // wxMessageBox("Route & Mark Manager will show the imported route",
+              // "Imported Route");
+
+  GetParent()->Refresh();
+}
+/*
+void finSAR_opsUIDialog::OnDeleteRoute(wxCommandEvent& event) {
+  int c = m_choiceRoutes->GetSelection();
+  wxString rt = m_choiceRoutes->GetString(c);
+  if (rt == "dummy") {
+    wxMessageBox("No route selected/nor Routes are not available", "No route");
+    return;
+  }
+  rt += ".rtz";
+
+  pPlugIn->DeleteRTZ_Name(rt);
+  m_choiceRoutes->SetSelection(0);
+  m_textCtrlRouteInUse->SetValue("");
+  DeleteChartedRoute();
+  RequestRefresh(pParent);
+}
+*/
+
 void finSAR_opsUIDialog::OnIndex(wxCommandEvent& event) {
-  //ReadRTZ();
-  std::string str = "finSAR_ops_pi_pi";
-  SendPluginMessage(wxString("finSAR_ops_pi_pi"), str);
-  return;
+  // ReadRTZ();
+  // std::string str = "finSAR_ops_pi_pi";
+  // SendPluginMessage(wxString("finSAR_ops_pi_pi"), str);
+  // return;
 
-
-  active_waypoint = FindActiveWaypoint(id_wpt);
+  // active_waypoint = FindActiveWaypoint(id_wpt);
   if (active_waypoint->wpName == wxEmptyString) {
-    wxMessageBox("Activate the route/waypoint");
+    wxMessageBox("Activate the waypoint/leg");
     return;
   }
   // wxMessageBox(active_waypoint->wpName);
@@ -877,8 +1106,8 @@ void finSAR_opsUIDialog::FindIndex(Position* A, Position* B) {
 }
 
 void finSAR_opsUIDialog::OnRange(wxCommandEvent& event) {
-  ReadRTZ();
-  active_waypoint = FindActiveWaypoint(id_wpt);
+  ReadRTZ("dummy.rtz");
+  // active_waypoint = FindActiveWaypoint(id_wpt);
   if (active_waypoint->wpName == wxEmptyString) {
     wxMessageBox("Check NMEA");
     return;
@@ -891,8 +1120,8 @@ void finSAR_opsUIDialog::OnRange(wxCommandEvent& event) {
 void finSAR_opsUIDialog::FindRange(Position* A, Position* B) {}
 
 void finSAR_opsUIDialog::OnDirection(wxCommandEvent& event) {
-  ReadRTZ();
-  active_waypoint = FindActiveWaypoint(id_wpt);
+  ReadRTZ("dummy.rtz");
+  //  active_waypoint = FindActiveWaypoint(id_wpt);
   if (active_waypoint->wpName == wxEmptyString) {
     wxMessageBox("Check NMEA");
     return;
@@ -956,37 +1185,16 @@ void finSAR_opsUIDialog::SetNMEAMessage(wxString sentence) {
   }
 }
 
-void finSAR_opsUIDialog::ReadRTZ() {
-  rtz_version = "";
-  Position my_position;
-  my_positions.clear();
+void finSAR_opsUIDialog::ReadRTZ(wxString file_name) {
+  my_positions.clear();  // Set up a new vector
 
-  wxString filename;
-  wxFileDialog dlg(this, "Select file", wxEmptyString, wxEmptyString,
-                   "RTZ files(*.rtz) | *.rtz;*.RTZ", wxFD_OPEN);
-  if (dlg.ShowModal() == wxID_OK) {
-    if (dlg.GetPath() != wxEmptyString) {
-      filename = dlg.GetPath();
-      // wxMessageBox(filename);
-    }
-
-  } else
-    wxMessageBox(_("No file entered"));
-
+  wxString file = file_name;
   pugi::xml_document xmlDoc;
   pugi::xml_parse_result result =
-      xmlDoc.load_file(filename.mb_str(), parse_default | parse_declaration);
+      xmlDoc.load_file(file.mb_str(), parse_default | parse_declaration);
 
   string rtz_version = xmlDoc.child("route").attribute("version").value();
-/*
-  if (rtz_version == "1.0") {
-    m_choiceSchema->SetSelection(0);
-  } else if (rtz_version == "1.1") {
-    m_choiceSchema->SetSelection(1);
-  } else if (rtz_version == "1.2") {
-    m_choiceSchema->SetSelection(2);
-  }
-*/
+
   pugi::xml_node pRoot = xmlDoc.child("route").child("routeInfo");
   if (pRoot == nullptr) return;
 
@@ -1016,10 +1224,16 @@ void finSAR_opsUIDialog::ReadRTZ() {
   xml_node pListWaypointsElement = pWaypointsElement.child("waypoint");
   if (pListWaypointsElement == nullptr) return;
 
+  int legnum = 0;
+
   while (pListWaypointsElement != nullptr) {
     string value = "nullptr";
     value = pListWaypointsElement.attribute("id").value();
     if (value == "nullptr") return;  // must have id
+
+    my_position.leg_number =
+        legnum;  // Route leg defined by the waypoint at the end of each leg
+
     my_position.wpId = value;
     // wxMessageBox(value);
 
@@ -1049,6 +1263,8 @@ void finSAR_opsUIDialog::ReadRTZ() {
         "waypoint");  // stop the loop when waypoints empty
 
     my_positions.push_back(my_position);
+
+    legnum++;
   }
 
   int count = my_positions.size();
@@ -1056,8 +1272,80 @@ void finSAR_opsUIDialog::ReadRTZ() {
   // wxMessageBox(mycount);
   // SetRTZversion(rtz_version);
 }
+/*
+void finSAR_opsUIDialog::OnContextMenu(double m_lat, double m_lon) {
+  // wxMessageBox("found");
+  // return;
 
-Position* finSAR_opsUIDialog::FindActiveWaypoint(wxString wpt_name) {
+  c_lat = m_lat;
+  c_lon = m_lon;
+
+  m_bDrawWptDisk = false;
+
+  int leg_number = SetActiveWaypoint(c_lat, c_lon);
+
+  // wxString comp = wxString::Format("%i", leg_number);
+  // wxMessageBox(comp);
+}
+*/
+int finSAR_opsUIDialog::SetActiveWaypoint(double t_lat, double t_lon) {
+  double wpDistance = 1000;
+  double rLat, rLon;
+  double minDist = 500.0;
+  int wpRefNum = 0;
+  int it_num = 0;
+  bool foundWP = false;
+  wxString wp_name;
+  wxString it_name;
+  double it_lat, it_lon;
+
+  if (my_positions.size() == 0) {
+    wxMessageBox("No RTZ file has been read");
+    return 999;
+  }
+
+  // while (!foundWP) {
+  for (vector<Position>::iterator it = my_positions.begin();
+       it != my_positions.end(); it++) {
+    wpRefNum = (*it).leg_number;
+
+    wp_name = (*it).wpName;
+
+    double value = 0.0;
+    wxString slat = (*it).lat;
+    slat.ToDouble(&value);
+    rLat = value;
+
+    double value2 = 0.0;
+    wxString slon = (*it).lon;
+    slon.ToDouble(&value2);
+    rLon = value2;
+
+    double brg;
+    // Bearing/Distance A -> B
+    DistanceBearingMercator_Plugin(rLat, rLon, t_lat, t_lon, &brg, &wpDistance);
+
+    if (wpDistance < minDist) {
+      minDist = wpDistance;
+      it_num = wpRefNum;
+      it_name = wp_name;
+      it_lat = rLat;
+      it_lon = rLon;
+      // foundWP = true;
+      // break;
+    }
+  }
+  // foundWP;
+  // wxMessageBox(it_name);
+  // FindWaypointGUID(it_name);
+  //
+
+  FindPreviousWaypoint(it_name);
+
+  return it_num;
+}
+
+Position* finSAR_opsUIDialog::FindPreviousWaypoint(wxString ActiveWpt) {
   active_waypoint = new Position;
   prev_waypoint = new Position;
   std::vector<Position>::iterator prev;
@@ -1066,7 +1354,7 @@ Position* finSAR_opsUIDialog::FindActiveWaypoint(wxString wpt_name) {
        itp != my_positions.end(); prev = itp, itp++) {
     wxString wpn = (*itp).wpName;
 
-    if (wpn == wpt_name) {
+    if (wpn == ActiveWpt) {
       active_waypoint->wpName = wpn;
       active_waypoint->lat = (*itp).lat;
       active_waypoint->lon = (*itp).lon;
@@ -1075,15 +1363,114 @@ Position* finSAR_opsUIDialog::FindActiveWaypoint(wxString wpt_name) {
       active_waypoint->wpId = (*itp).wpId;
       // wxMessageBox(active_waypoint->wpId);
 
+      double value = 0.0;
+      wxString slat = active_waypoint->lat;
+      slat.ToDouble(&value);
+      active_wp_lat = value;
+
+      double value2 = 0.0;
+      wxString slon = active_waypoint->lon;
+      slon.ToDouble(&value2);
+      active_wp_lon = value2;
+
+      prev_waypoint->wpId = (*prev).wpId;
       prev_waypoint->wpName = (*prev).wpName;
+
       prev_waypoint->lat = (*prev).lat;
       prev_waypoint->lon = (*prev).lon;
+
+      // wxMessageBox(prev_waypoint->wpId);
+
+      m_bDrawWptDisk = true;
+      RequestRefresh(pParent);
 
       return active_waypoint;
     }
   }
+
+  m_bDrawWptDisk = false;
   active_waypoint->wpName = wxEmptyString;
   return active_waypoint;
+}
+
+int finSAR_opsUIDialog::DeleteChartedRoute() {
+  std::vector<std::unique_ptr<PlugIn_Route_Ex>> routes;
+  auto uids = GetRouteGUIDArray();
+  if (uids.size() > 1) {
+    wxMessageBox("Clear the other routes!");
+    return 0;
+  }
+
+  DeletePlugInRoute(uids[0]);
+  return 1;
+}
+
+wxString finSAR_opsUIDialog::FindWaypointGUID(wxString testName) {
+  std::vector<std::unique_ptr<PlugIn_Route_Ex>> routes;
+  auto uids = GetRouteGUIDArray();
+  if (uids.size() > 1) {
+    wxMessageBox("Clear the other routes");
+    return wxEmptyString;
+  }
+
+  thisRoute = GetRouteEx_Plugin(uids[0]);
+
+  myList = thisRoute->pWaypointList;
+
+  PlugIn_Waypoint_Ex* myWaypoint;
+  PlugIn_Waypoint_Ex* myPrevWaypoint;
+
+  wxPlugin_WaypointExListNode* pwpnode = myList->GetFirst();
+  while (pwpnode) {
+    myWaypoint = pwpnode->GetData();
+    if (myWaypoint->m_MarkName == testName) {
+      wxMessageBox("found");
+      break;
+    };
+    myPrevWaypoint = myWaypoint;
+    pwpnode = pwpnode->GetNext();
+  }
+
+  myWaypoint;
+}
+
+double finSAR_opsUIDialog::FindDistanceFromLeg(Position* A, Position* B,
+                                               Position* C) {
+  double value = 0.0;
+  A->lat.ToDouble(&value);
+  double lat1 = value;
+  A->lon.ToDouble(&value);
+  double lon1 = value;
+  B->lat.ToDouble(&value);
+  double lat2 = value;
+  B->lon.ToDouble(&value);
+  double lon2 = value;
+  C->lat.ToDouble(&value);
+  double lat3 = value;
+  C->lon.ToDouble(&value);
+  double lon3 = value;
+
+  // Bearing A -> C
+  double dist1, dist2, brg1, brg2;
+  DistanceBearingMercator_Plugin(lat3, lon3, lat1, lon1, &brg1, &dist1);
+  // Bearing A -> B
+  DistanceBearingMercator_Plugin(lat2, lon2, lat1, lon1, &brg2, &dist2);
+
+  wxString sbrg1 = wxString::Format("%f", brg1);
+  // wxMessageBox(sbrg1);
+
+  wxString sbrg2 = wxString::Format("%f", brg2);
+  // wxMessageBox(sbrg2);
+  /*
+  Location a;
+  Location b;
+  Location x;
+*/
+  double ax = dist1;
+  double alfa = (abs(brg2 - brg1)) / 180 * PI;
+  double distance = sin(alfa) * ax;
+
+  return distance;
 }
 
 ///////////////////////////////////////////////////////////////////////////

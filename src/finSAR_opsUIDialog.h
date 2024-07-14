@@ -62,6 +62,12 @@
 #include <wx/uiaction.h>
 #include <wx/app.h>
 #include <cmath>
+#include <wx/menu.h>
+#include <wx/string.h>
+
+#if wxUSE_UIACTIONSIMULATOR
+#include "wx/uiaction.h"
+#endif
 
 /* XPM */
 static const char* eye[] = {"20 20 7 1",
@@ -234,6 +240,7 @@ public:
   int routepoint;
   wxString route_name;
   wxString planned_speed;
+  int leg_number;
 };
 
 
@@ -261,7 +268,7 @@ public:
 
   finSAR_ops_pi* pPlugIn;
 
-  void SetCursorLatLon(double lat, double lon);
+  //void SetCursorLatLon(double lat, double lon);
 
   void SetViewPort(PlugIn_ViewPort* vp);
   PlugIn_ViewPort* vp;
@@ -289,9 +296,20 @@ public:
   bool OpenXML(wxString filename, bool reportfailure);
   void SaveXML();
 
-  void OnContextMenu(double m_lat, double m_lon);
+  //void OnContextMenu(double m_lat, double m_lon);
 
-  wxArrayString TideCurrentDataSet;
+  double FindDistanceFromLeg(Position* A, Position* B,
+                                                  Position* C);
+  int SetActiveWaypoint(double t_lat, double t_lon);
+  bool m_bDrawWptDisk;
+  Position* FindPreviousWaypoint(wxString ActiveWpt);
+
+  int DeleteChartedRoute();
+  wxString FindWaypointGUID(wxString testName);
+
+  PlugIn_Waypoint_Ex* active_wpt, prev_wpt;
+
+  double c_lat, c_lon;
 
   double deg2rad(double deg);
   double rad2deg(double rad);
@@ -305,18 +323,18 @@ public:
   wxString m_default_configuration_path;
   wxString m_default_files_path;
 
+  Position my_position;
   vector<Position> my_positions;
   vector<Position> my_points;
 
+  double active_wp_lat, active_wp_lon;
+  double prev_wp_lat, prev_wp_lon;
 
   wxString rte_start;
   wxString rte_end;
 
-  wxString thisRoute;
+  //wxString thisRoute;
   void AddTestItems(wxCommandEvent& event);
-  void OnBeginDrag(wxTreeEvent& event);
-  void OnEndDrag(wxTreeEvent& event);
-  wxTreeItemId m_draggedItem;
   ConfigurationDialog m_ConfigurationDialog;
 
   PlugIn_ViewPort *m_vp, m_current_vp;
@@ -397,14 +415,21 @@ private:
   wxString rtz_version;
   void SetBearingWaypoint();
   wxArrayString my_areas[10], my_files[10][10];
-  void AddAreas();
   int ca, cf;
   wxString id_wpt;
-  void ReadRTZ();
-  Position* FindActiveWaypoint(wxString wpt_name);
+  void ReadRTZ(wxString file_name);
+  void ChartTheRoute(wxString myRoute);
+
   Position* active_waypoint;
   Position* prev_waypoint;
-  void OnLoadRTZ(wxCommandEvent& event);
+  void OnNewRoute(wxCommandEvent& event);
+  void OnSaveRoute(wxCommandEvent& event);
+  unique_ptr<PlugIn_Route_Ex> thisRoute;
+  vector<PlugIn_Waypoint_Ex*> theWaypoints;
+  Plugin_WaypointExList* myList;
+  void WriteRTZ(wxString route_name);
+  void OnLoadRoute(wxCommandEvent& event);
+  //void OnDeleteRoute(wxCommandEvent& event);
   //void ChartTheRoute(wxString myRoute);
   void OnIndex(wxCommandEvent& event);
   void FindIndex(Position* A, Position* B);
@@ -412,6 +437,7 @@ private:
   void FindRange(Position* A, Position* B);
   void OnDirection(wxCommandEvent& event);
   void FindDirection(Position* A, Position* B);
+
  
 };
 
@@ -471,7 +497,7 @@ public:
   void OnBeginLabelEdit(wxTreeEvent& event);
   void OnEndLabelEdit(wxTreeEvent& event);
   void OnDeleteItem(wxTreeEvent& event);
-  void OnContextMenu(wxContextMenuEvent& event);
+  void OnMenu(wxContextMenuEvent& event);
   void OnItemMenu(wxTreeEvent& event);
   void OnGetInfo(wxTreeEvent& event);
   void OnSetInfo(wxTreeEvent& event);
@@ -486,9 +512,9 @@ public:
   void OnItemStateClick(wxTreeEvent& event);
   void OnItemRClick(wxTreeEvent& event);
 
-  void OnRMouseDown(wxMouseEvent& event);
-  void OnRMouseUp(wxMouseEvent& event);
-  void OnRMouseDClick(wxMouseEvent& event);
+  //void OnRMouseDown(wxMouseEvent& event);
+  //void OnRMouseUp(wxMouseEvent& event);
+  //void OnRMouseDClick(wxMouseEvent& event);
 
   wxTreeItemId GetLastTreeITem() const;
   void GetItemsRecursively(const wxTreeItemId& idParent,
