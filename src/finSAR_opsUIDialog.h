@@ -37,7 +37,6 @@
 #include <wx/glcanvas.h>
 
 #include "finSAR_opsUIDialogBase.h"
-#include "routeprop.h"
 #include "NavFunc.h"
 
 #include <wx/progdlg.h>
@@ -56,14 +55,23 @@
 #include <wx/thread.h>
 #include <wx/event.h>
 #include <wx/listctrl.h>
-#include "tableroutes.h"
-#include <wx/treebase.h>
-#include <wx/treectrl.h>
 #include <wx/uiaction.h>
 #include <wx/app.h>
 #include <cmath>
 #include <wx/menu.h>
 #include <wx/string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <ctime>
+#include <wx/filefn.h>
+
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
+#ifdef WIN32
+#define stat _stat
+#endif
 
 #if wxUSE_UIACTIONSIMULATOR
 #include "wx/uiaction.h"
@@ -130,52 +138,26 @@ class wxFileConfig;
 class finSAR_ops_pi;
 class wxGraphicsContext;
 class routeprop;
-class TableRoutes;
-class ConfigurationDialog;
-class NewPositionDialog;
 class IndexTarget;
 class DirectionTarget;
 class RangeTarget;
 
-///////////////////////////////////////////////////////////////////////////////
-/// Class ConfigurationDialog
-///////////////////////////////////////////////////////////////////////////////
-class ConfigurationDialog : public wxDialog {
-private:
-protected:
-  wxButton* m_bDelete;
-  wxButton* m_bSelect;
-  wxButton* m_bGenerate;
-  wxButton* m_bClose;
-
-  // Virtual event handlers, overide them in your derived class
-  void OnDelete(wxCommandEvent& event);
-  void OnInformation(wxCommandEvent& event);
-  void OnGenerate(wxCommandEvent& event);
-  void OnClose(wxCommandEvent& event);
-
-public:
-  finSAR_ops_pi* pPlugIn;
-  wxListBox* m_lRoutes;
-
-  ConfigurationDialog(wxWindow* parent, wxWindowID id = wxID_ANY,
-                      const wxString& title = _("Tidal Routes"),
-                      const wxPoint& pos = wxDefaultPosition,
-                      const wxSize& size = wxDefaultSize,
-                      long style = wxDEFAULT_DIALOG_STYLE);
-  ~ConfigurationDialog();
-};
-
 class IndexTarget {
 public:
   wxString route_name;
+  wxString date_stamp;
   wxString wpId;
   double beginLat, beginLon;
   double endLat, endLon;
+  double distance;
+  double label_lat;
+  double label_lon;
 };
 
 class DirectionTarget {
 public:
+  wxString route_name;
+  wxString date_stamp;
   wxString dId;
   double m_lat, m_lon;
   double m_dir;
@@ -183,9 +165,14 @@ public:
 
 class RangeTarget {
 public:
-  wxString rId;
+  wxString route_name;
+  wxString date_stamp;
+  wxString wpId;
   double beginLat, beginLon;
   double endLat, endLon;
+  double distance;
+  double label_lat;
+  double label_lon;
 };
 
 class rtept {
@@ -243,22 +230,6 @@ public:
   int leg_number;
 };
 
-
-struct RouteMapPosition {
-  RouteMapPosition(wxString n, double lat0, double lon0)
-      : Name(n), lat(lat0), lon(lon0) {}
-
-public:
-  wxString Name;
-  double lat, lon;
-};
-
-class TidalRoute {
-public:
-  wxString Name, Type, Start, StartTime, End, EndTime, Time, Distance, m_GUID;
-  list<Position> m_positionslist;
-};
-
 #define pi 3.14159265358979323846
 
 class finSAR_opsUIDialog : public finSAR_opsUIDialogBase {
@@ -268,7 +239,7 @@ public:
 
   finSAR_ops_pi* pPlugIn;
 
-  //void SetCursorLatLon(double lat, double lon);
+  // void SetCursorLatLon(double lat, double lon);
 
   void SetViewPort(PlugIn_ViewPort* vp);
   PlugIn_ViewPort* vp;
@@ -287,27 +258,21 @@ public:
   wxString MakeDateTimeLabel(wxDateTime myDateTime);
   void OnInformation(wxCommandEvent& event);
 
-  void GetTable(wxString myRoute);
   void AddChartRoute(wxString myRoute);
 
   virtual void Lock() { routemutex.Lock(); }
   virtual void Unlock() { routemutex.Unlock(); }
 
-  bool OpenXML(wxString filename, bool reportfailure);
-  void SaveXML();
+  void OnContextMenu(double m_lat, double m_lon);
 
-  //void OnContextMenu(double m_lat, double m_lon);
-
-  double FindDistanceFromLeg(Position* A, Position* B,
-                                                  Position* C);
+  double FindDistanceFromLeg(Position* A, Position* B, Position* C);
   int SetActiveWaypoint(double t_lat, double t_lon);
   bool m_bDrawWptDisk;
+  bool m_bDrawDirectionArrow;
   Position* FindPreviousWaypoint(wxString ActiveWpt);
 
   int DeleteChartedRoute();
-  wxString FindWaypointGUID(wxString testName);
-
-  PlugIn_Waypoint_Ex* active_wpt, prev_wpt;
+  PlugIn_Waypoint_Ex *active_wpt, prev_wpt;
 
   double c_lat, c_lon;
 
@@ -315,13 +280,6 @@ public:
   double rad2deg(double rad);
   wxString SelectRoute(bool isDR);
   void SelectRoutePoints(wxString routeName);
-
-  int m_tcNum;
-  double m_tcLat, m_tcLon;
-
-  vector<RouteMapPosition> Positions;
-  wxString m_default_configuration_path;
-  wxString m_default_files_path;
 
   Position my_position;
   vector<Position> my_positions;
@@ -333,9 +291,7 @@ public:
   wxString rte_start;
   wxString rte_end;
 
-  //wxString thisRoute;
   void AddTestItems(wxCommandEvent& event);
-  ConfigurationDialog m_ConfigurationDialog;
 
   PlugIn_ViewPort *m_vp, m_current_vp;
   PlugIn_ViewPort& GetCurrentViewPort() { return m_current_vp; }
@@ -344,19 +300,14 @@ public:
   double chartScale;
   double centreLat;
   double centreLon;
-  void OnButtonEBL(wxCommandEvent& event);
-  void OnButtonEBL_off(wxCommandEvent& event);
   void MakeBoxPoints();
   bool m_bBearingLine;
+  bool m_bIndexLabel;
   bool m_bMoveUpDownLeftRight;
   double m_ShipLat1, m_ShipLon1;
   double m_ShipLat2, m_ShipLon2;
   double ebl_lat, ebl_lon;
-  void MakeEBLEvent();
   void key_shortcut(wxKeyEvent& event);
-  void OnCursor(void);
-  void OnTimer(wxTimerEvent& event);
-  void SetNMEAMessage(wxString sentence);
   IndexTarget* i_target;
   DirectionTarget* d_target;
   RangeTarget* r_target;
@@ -365,7 +316,8 @@ public:
   vector<DirectionTarget> d_vector;
   vector<RangeTarget> r_vector;
 
-  void OnSaveObjects(wxCommandEvent& event);
+  wxString m_dateStamp;
+  wxWindow* pParent;
 
 protected:
 private:
@@ -389,17 +341,10 @@ private:
   vector<rte> my_routes;
   vector<rtept> routePoints;
   vector<routeLeg> routeLegs;
-
-
-  void OnReadRTZ(wxCommandEvent& event);
-
   wxString mySelectedRoute;
+  int mySelectedLeg;
 
   int GetRandomNumber(int range_min, int range_max);
-
-  //    Data
-  wxWindow* pParent;
-
   double m_cursor_lat, m_cursor_lon;
   wxString g_SData_Locn;
 
@@ -413,32 +358,41 @@ private:
   int GetScale(double myChartScale);
 
   wxString rtz_version;
-  void SetBearingWaypoint();
   wxArrayString my_areas[10], my_files[10][10];
   int ca, cf;
   wxString id_wpt;
   void ReadRTZ(wxString file_name);
+  void ReadEXT(wxString file_name);
   void ChartTheRoute(wxString myRoute);
 
   Position* active_waypoint;
   Position* prev_waypoint;
   void OnNewRoute(wxCommandEvent& event);
   void OnSaveRoute(wxCommandEvent& event);
+  void OnImportRoute(wxCommandEvent& event);
+  void OnExportRoute(wxCommandEvent& event);
+  void ExportRoute(wxString route);
   unique_ptr<PlugIn_Route_Ex> thisRoute;
   vector<PlugIn_Waypoint_Ex*> theWaypoints;
   Plugin_WaypointExList* myList;
   void WriteRTZ(wxString route_name);
+  void WriteEXT(wxString route_name);
   void OnLoadRoute(wxCommandEvent& event);
-  //void OnDeleteRoute(wxCommandEvent& event);
-  //void ChartTheRoute(wxString myRoute);
+  void OnDeleteRoute(wxCommandEvent& event);
+  void DeleteRTZFile(wxString route_name);
+  void DeleteEXTFile(wxString route_name);
+  void OnLoadExtensions(wxCommandEvent& event);
+  void OnSaveExtensions(wxCommandEvent& event);
   void OnIndex(wxCommandEvent& event);
-  void FindIndex(Position* A, Position* B);
+  void SaveIndexRangeDirection(wxString route_name, wxString date_stamp);
+  void GetIndex(Position* A, Position* B);
+  void OnIndexDelete(wxCommandEvent& event);
   void OnRange(wxCommandEvent& event);
-  void FindRange(Position* A, Position* B);
+  void GetRange(Position* A, Position* B);
+  void OnRangeDelete(wxCommandEvent& event);
   void OnDirection(wxCommandEvent& event);
-  void FindDirection(Position* A, Position* B);
-
- 
+  void GetDirection(Position* A, Position* B);
+  void OnDirectionDelete(wxCommandEvent& event);
 };
 
 class GetRouteDialog : public wxDialog {
@@ -460,133 +414,6 @@ public:
 
 protected:
 private:
-};
-
-class MyTreeItemData : public wxTreeItemData {
-public:
-  MyTreeItemData(const wxString& desc) : m_desc(desc) {}
-
-  void ShowInfo(wxTreeCtrl* tree);
-  wxString const& GetDesc() const { return m_desc; }
-
-private:
-  wxString m_desc;
-};
-
-class treeCtrlRoutes : public wxTreeCtrl {
-public:
-  enum {
-    TreeCtrlIcon_File,
-    TreeCtrlIcon_FileSelected,
-    TreeCtrlIcon_Folder,
-    TreeCtrlIcon_FolderSelected,
-    TreeCtrlIcon_FolderOpened
-  };
-
-  treeCtrlRoutes() {
-    m_alternateImages = false;
-    m_alternateStates = false;
-  }
-  treeCtrlRoutes(wxWindow* parent, const wxWindowID id, const wxPoint& pos,
-                 const wxSize& size, long style);
-  virtual ~treeCtrlRoutes() {}
-
-  void OnBeginDrag(wxTreeEvent& event);
-  void OnBeginRDrag(wxTreeEvent& event);
-  void OnEndDrag(wxTreeEvent& event);
-  void OnBeginLabelEdit(wxTreeEvent& event);
-  void OnEndLabelEdit(wxTreeEvent& event);
-  void OnDeleteItem(wxTreeEvent& event);
-  void OnMenu(wxContextMenuEvent& event);
-  void OnItemMenu(wxTreeEvent& event);
-  void OnGetInfo(wxTreeEvent& event);
-  void OnSetInfo(wxTreeEvent& event);
-  void OnItemExpanded(wxTreeEvent& event);
-  void OnItemExpanding(wxTreeEvent& event);
-  void OnItemCollapsed(wxTreeEvent& event);
-  void OnItemCollapsing(wxTreeEvent& event);
-  void OnSelChanged(wxTreeEvent& event);
-  void OnSelChanging(wxTreeEvent& event);
-  void OnTreeKeyDown(wxTreeEvent& event);
-  void OnItemActivated(wxTreeEvent& event);
-  void OnItemStateClick(wxTreeEvent& event);
-  void OnItemRClick(wxTreeEvent& event);
-
-  //void OnRMouseDown(wxMouseEvent& event);
-  //void OnRMouseUp(wxMouseEvent& event);
-  //void OnRMouseDClick(wxMouseEvent& event);
-
-  wxTreeItemId GetLastTreeITem() const;
-  void GetItemsRecursively(const wxTreeItemId& idParent,
-                           wxTreeItemIdValue cookie = 0);
-
-  // This function behaves differently depending on the value of size:
-  //  - If it's -1, it turns off the use of images entirely.
-  //  - If it's 0, it reuses the last used size.
-  //  - If it's strictly positive, it creates icons in this size.
-  void CreateImages(int size);
-
-  void CreateButtonsImageList(int size = 11);
-  void CreateStateImageList(bool del = false);
-
-  void AddTestItemsToTree(size_t numChildren, size_t depth);
-
-  void DoSortChildren(const wxTreeItemId& item, bool reverse = false) {
-    m_reverseSort = reverse;
-    wxTreeCtrl::SortChildren(item);
-  }
-
-  void DoToggleIcon(const wxTreeItemId& item);
-  void DoToggleState(const wxTreeItemId& item);
-
-  void ShowMenu(wxTreeItemId id, const wxPoint& pt);
-
-  int ImageSize(void) const { return m_imageSize; }
-
-  void SetAlternateImages(bool show) { m_alternateImages = show; }
-  bool AlternateImages() const { return m_alternateImages; }
-
-  void SetAlternateStates(bool show) { m_alternateStates = show; }
-  bool AlternateStates() const { return m_alternateStates; }
-
-  void ResetBrokenStateImages() {
-    const size_t count = GetStateImageList()->GetImageCount();
-    int state = count > 0 ? count - 1 : wxTREE_ITEMSTATE_NONE;
-    DoResetBrokenStateImages(GetRootItem(), 0, state);
-  }
-
-protected:
-  virtual int OnCompareItems(const wxTreeItemId& i1,
-                             const wxTreeItemId& i2) wxOVERRIDE;
-
-  // is this the test item which we use in several event handlers?
-  bool IsTestItem(const wxTreeItemId& item) {
-    // the test item is the first child folder
-    return GetItemParent(item) == GetRootItem() && !GetPrevSibling(item);
-  }
-
-private:
-  // Find the very last item in the tree.
-  void AddItemsRecursively(const wxTreeItemId& idParent, size_t nChildren,
-                           size_t depth, size_t folder);
-
-  void DoResetBrokenStateImages(const wxTreeItemId& idParent,
-                                wxTreeItemIdValue cookie, int state);
-
-  void LogEvent(const wxString& name, const wxTreeEvent& event);
-
-  int m_imageSize;             // current size of images
-  bool m_reverseSort;          // flag for OnCompareItems
-  wxTreeItemId m_draggedItem;  // item being dragged right now
-  bool m_alternateImages;
-  bool m_alternateStates;
-
-  // NB: due to an ugly wxMSW hack you _must_ use wxDECLARE_DYNAMIC_CLASS();
-  //     if you want your overloaded OnCompareItems() to be called.
-  //     OTOH, if you don't want it you may omit the next line - this will
-  //     make default (alphabetical) sorting much faster under wxMSW.
-  wxDECLARE_DYNAMIC_CLASS(MyTreeCtrl);
-  wxDECLARE_EVENT_TABLE();
 };
 
 #endif

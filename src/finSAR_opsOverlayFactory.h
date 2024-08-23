@@ -32,42 +32,25 @@
 #include "ocpn_plugin.h"
 #include <wx/object.h>
 #include <wx/font.h>
+#include <wx/dcbuffer.h>
+#include <wx/dc.h>
 
 class piDC;
 
 using namespace std;
 
-#define NUM_COURSE_ARROW_POINTS 9
-static wxPoint DirectionArrowArray[NUM_COURSE_ARROW_POINTS] = {
+#define NUM_DIRECTION_ARROW_POINTS 9
+static wxPoint DirectionArrowArray[NUM_DIRECTION_ARROW_POINTS] = {
     wxPoint(0, 0),    wxPoint(0, -10), wxPoint(55, -10),
     wxPoint(55, -25), wxPoint(100, 0), wxPoint(55, 25),
     wxPoint(55, 10),  wxPoint(0, 10),  wxPoint(0, 0)};
 
-//----------------------------------------------------------------------------------------------------------
-//    finSAR_ops Overlay Specification
-//----------------------------------------------------------------------------------------------------------
+#define NUM_REVERSE_ARROW_POINTS 9
+static wxPoint ReverseArrowArray[NUM_REVERSE_ARROW_POINTS] = {
+    wxPoint(100, -100), wxPoint(100, -90),  wxPoint(45, -90),
+    wxPoint(45, -75),  wxPoint(0, -100),    wxPoint(45, -125),
+    wxPoint(45, -110), wxPoint(100, -110), wxPoint(100, -100)};
 
-class finSAR_opsOverlay {
-public:
-  finSAR_opsOverlay(void) {
-    m_iTexture = 0;
-    m_pDCBitmap = NULL, m_pRGBA = NULL;
-  }
-
-  ~finSAR_opsOverlay(void) {
-    if (m_iTexture)
-      // glDeleteTextures( 1, &m_iTexture );
-      delete m_pDCBitmap, delete[] m_pRGBA;
-  }
-
-  unsigned int m_iTexture; /* opengl mode */
-
-  wxBitmap *m_pDCBitmap; /* dc mode */
-  unsigned char *m_pRGBA;
-
-  int m_width;
-  int m_height;
-};
 
 //----------------------------------------------------------------------------------------------------------
 //    finSAR_ops Overlay Factory Specification
@@ -93,59 +76,34 @@ public:
   }
   void setData(double lat1, double lon1);
   bool RenderOverlay(piDC &dc, PlugIn_ViewPort &vp);
-  /*
-  void DrawCurrentIndicators(PlugIn_ViewPort *BBox, bool bRebuildSelList,
-                             bool bforce_redraw_currents,
-                             bool bdraw_mono_for_mask, wxDateTime myTime);
- */
   void Reset();
-  wxImage &DrawGLText(double value, int precision);
-  wxImage &DrawGLTextDir(double value, int precision);
-  wxImage &DrawGLTextString(wxString myText);
-  wxImage &DrawGLPolygon();
-
-  void DrawGLLabels(finSAR_opsOverlayFactory *pof, wxDC *dc, PlugIn_ViewPort *vp,
-                    wxImage &imageLabel, double myLat, double myLon,
-                    int offset);
-
-  void drawGLPolygons(finSAR_opsOverlayFactory *pof, wxDC *dc,
-                      PlugIn_ViewPort *vp, wxImage &imageLabel, double myLat,
-                      double myLon, int offset);
-
-  void DrawOLBitmap(const wxBitmap &bitmap, wxCoord x, wxCoord y, bool usemask);
-  PlugIn_ViewPort *vp;
-  bool m_bShowRate;
-  bool m_bShowDirection;
-  bool m_bShowFillColour;
   wxDateTime m_dtUseNew;
 
   piDC *m_dc;
-  /*
-  bool drawCourseArrows(int x, int y, double rot_angle, double scale,
-                        double rate);
-  */
+
+private:
+
   wxPoint polyPoints[7];
   wxPoint rectPoints[7];
 
-private:
+  wxPoint polyReversePoints[7];
+  wxPoint rectReversePoints[7];
+
   double myLat1;
   double myLon1;
   void DrawAllLinesInViewPort(PlugIn_ViewPort *BBox);
+  wxBitmap m_bmp;
+  wxImage &DrawLabel(double value, int precision);
   void DrawWptDisk(PlugIn_ViewPort *BBox);
-  void DrawEBLLineInViewPort(PlugIn_ViewPort *BBox);
-  void DrawBearingLineInViewPort(PlugIn_ViewPort *BBox);
   void DrawIndexTargets(PlugIn_ViewPort *BBox);
+  void DrawRangeTargets(PlugIn_ViewPort *BBox);
 
-  void DrawAllDirectionsInViewPort(PlugIn_ViewPort *BBox);
+  void DrawDirectionTargets(PlugIn_ViewPort *BBox);
+  wxImage DrawDirectionArrows(int x, int y, double scale);
+  wxImage DrawDirectionLabels(double value, int x, int y, double scale, bool reverse);
 
-  bool DrawDirectionArrow(int x, int y, double rot_angle, double scale,
-                          double direction, wxColour arrow_color);
   wxPoint p[12];
-
-  // bool DoRenderfinSAR_opsOverlay(PlugIn_ViewPort *vp);
-  void DrawGLLine(double x1, double y1, double x2, double y2, double width,
-                  wxColour myColour);
-  void DrawMessageWindow(wxString msg, int x, int y, wxFont *mfont);
+  wxPoint r[12];
 
   double m_last_vp_scale;
 
