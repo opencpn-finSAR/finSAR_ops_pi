@@ -9,12 +9,12 @@
 
 extern void initialize_images(void);
 
-extern wxBitmap *_img_finSAR_ops;
-extern wxBitmap *_img_finSAR_ops_pi;
+extern wxBitmap *_img_finSAR_edit;
+extern wxBitmap *_img_finSAR_edit_pi;
 
 #ifdef ocpnUSE_SVG
-extern wxString _svg_finSAR_ops;
-extern wxString _svg_finSAR_ops_toggled;
+extern wxString _svg_finSAR_edit;
+extern wxString _svg_finSAR_edit_toggled;
 #endif
 
 #endif /* ICONS_H */

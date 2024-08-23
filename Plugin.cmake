@@ -13,16 +13,16 @@
 # -------- Options ----------
 
 set(OCPN_TEST_REPO
-    "opencpn/finsar_ops-alpha"
+    "finsar/finsar_edit-alpha"
     CACHE STRING "Default repository for untagged builds"
 )
 set(OCPN_BETA_REPO
-    "opencpn/finsar_ops-beta"
+    "finsar/finsar_edit-beta"
     CACHE STRING
     "Default repository for tagged builds matching 'beta'"
 )
 set(OCPN_RELEASE_REPO
-    "opencpn/finsar_ops-prod"
+    "finsar/finsar_edit-prod"
     CACHE STRING
     "Default repository for tagged builds not matching 'beta'"
 )
@@ -31,12 +31,12 @@ set(OCPN_RELEASE_REPO
 #
 # -------  Plugin setup --------
 #
-set(PKG_NAME finSAR_ops_pi)
-set(PKG_VERSION  0.1.0)
+set(PKG_NAME finSAR_edit_pi)
+set(PKG_VERSION  0.2.0)
 set(PKG_PRERELEASE "")  # Empty, or a tag like 'beta'
 
-set(DISPLAY_NAME finSAR_ops)    # Dialogs, installer artifacts, ...
-set(PLUGIN_API_NAME finSAR_ops) # As of GetCommonName() in plugin API
+set(DISPLAY_NAME finSAR_edit)    # Dialogs, installer artifacts, ...
+set(PLUGIN_API_NAME finSAR_edit) # As of GetCommonName() in plugin API
 set(PKG_SUMMARY "Finland SAR")
 set(PKG_DESCRIPTION [=[
 For Finland SAR.
@@ -44,30 +44,23 @@ For Finland SAR.
 
 set(PKG_AUTHOR "Mike Rossiter")
 set(PKG_IS_OPEN_SOURCE "yes")
-set(PKG_HOMEPAGE https://github.com/Rasbats/finSAR_ops_pi)
-set(PKG_INFO_URL https://opencpn.org/OpenCPN/plugins/finSAR_ops.html)
+set(PKG_HOMEPAGE https://github.com/Rasbats/finSAR_edit_pi)
+set(PKG_INFO_URL https://opencpn.org/OpenCPN/plugins/finSAR_edit.html)
 
 SET(SRC
-        src/finSAR_ops_pi.h
-        src/finSAR_ops_pi.cpp
-        src/finSAR_opsOverlayFactory.cpp
-        src/finSAR_opsOverlayFactory.h
-        src/finSAR_opsUIDialogBase.cpp
-        src/finSAR_opsUIDialogBase.h
-        src/finSAR_opsUIDialog.cpp
-        src/finSAR_opsUIDialog.h
+        src/finSAR_edit_pi.h
+        src/finSAR_edit_pi.cpp
+        src/finSAR_editOverlayFactory.cpp
+        src/finSAR_editOverlayFactory.h
+        src/finSAR_editUIDialogBase.cpp
+        src/finSAR_editUIDialogBase.h
+        src/finSAR_editUIDialog.cpp
+        src/finSAR_editUIDialog.h
         src/icons.h
         src/icons.cpp
         src/NavFunc.cpp
         src/NavFunc.h
-        src/routeprop.cpp
-        src/routeprop.h
-        src/tableroutes.cpp
-        src/tableroutes.h
-        src/logger.cpp
-        src/logger.h
         src/pugixml.hpp
-
     )
 
 set(PKG_API_LIB api-18)  #  A directory in libs/ e. g., api-17 or api-16
@@ -85,7 +78,7 @@ macro(add_plugin_libraries)
   add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/wxJSON")
   target_link_libraries(${PACKAGE_NAME} ocpn::wxjson)
 
-  add_subdirectory("${CMAKE_SOURCE_DIR}/libs/plugin_dc")
+  add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/plugin_dc")
   target_link_libraries(${PACKAGE_NAME} ocpn::plugin-dc)
 
   add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/jsoncpp")
@@ -93,6 +86,7 @@ macro(add_plugin_libraries)
 
   add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/sqlite")
   target_link_libraries(${PACKAGE_NAME} ocpn::sqlite)
+
 
   # The wxsvg library enables SVG overall in the plugin
   add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/wxsvg")
