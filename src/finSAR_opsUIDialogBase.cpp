@@ -126,34 +126,11 @@ finSAR_opsUIDialogBase::finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id,
 	m_menubar3->Append( m_mHelp, _("Help") );
 
 	m_mRoutes = new wxMenu();
-	wxMenuItem* m_mNewRoute;
-	m_mNewRoute = new wxMenuItem( m_mRoutes, wxID_ANY, wxString( _("New Route") ) , wxEmptyString, wxITEM_NORMAL );
-	m_mRoutes->Append( m_mNewRoute );
-
-	wxMenuItem* m_mSaveRoute;
-	m_mSaveRoute = new wxMenuItem( m_mRoutes, wxID_ANY, wxString( _("Save Route") ) , wxEmptyString, wxITEM_NORMAL );
-	m_mRoutes->Append( m_mSaveRoute );
-
 	wxMenuItem* m_mLoadRoute;
 	m_mLoadRoute = new wxMenuItem( m_mRoutes, wxID_ANY, wxString( _("Load Route") ) , wxEmptyString, wxITEM_NORMAL );
 	m_mRoutes->Append( m_mLoadRoute );
 
-	wxMenuItem* m_mImportRoute;
-	m_mImportRoute = new wxMenuItem( m_mRoutes, wxID_ANY, wxString( _("Load Route") ) , wxEmptyString, wxITEM_NORMAL );
-	m_mRoutes->Append( m_mImportRoute );
-
-	wxMenuItem* m_mDeleteRoute;
-	m_mDeleteRoute = new wxMenuItem( m_mRoutes, wxID_ANY, wxString( _("Load Route") ) , wxEmptyString, wxITEM_NORMAL );
-	m_mRoutes->Append( m_mDeleteRoute );
-
 	m_menubar3->Append( m_mRoutes, _("Routes") );
-
-	m_mExtensions = new wxMenu();
-	wxMenuItem* m_mSaveExtensionsFile;
-	m_mSaveExtensionsFile = new wxMenuItem( m_mExtensions, wxID_ANY, wxString( _("Save Extensions File") ) , wxEmptyString, wxITEM_NORMAL );
-	m_mExtensions->Append( m_mSaveExtensionsFile );
-
-	m_menubar3->Append( m_mExtensions, _("Extensions") );
 
 	this->SetMenuBar( m_menubar3 );
 
@@ -167,12 +144,7 @@ finSAR_opsUIDialogBase::finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id,
 	m_bLoadRoute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), NULL, this );
 	m_mHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnInformation ), this, m_mInformation->GetId());
 	m_mHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnAbout ), this, m_mAbout->GetId());
-	m_mRoutes->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnNewRoute ), this, m_mNewRoute->GetId());
-	m_mRoutes->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnSaveRoute ), this, m_mSaveRoute->GetId());
 	m_mRoutes->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), this, m_mLoadRoute->GetId());
-	m_mRoutes->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnImportRoute ), this, m_mImportRoute->GetId());
-	m_mRoutes->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnDeleteRoute ), this, m_mDeleteRoute->GetId());
-	m_mExtensions->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnSaveExtensions ), this, m_mSaveExtensionsFile->GetId());
 }
 
 finSAR_opsUIDialogBase::~finSAR_opsUIDialogBase()

@@ -98,7 +98,6 @@ public:
   double GetShipLon(void) { return m_ship_lon; }
   double GetShipLat(void) { return m_ship_lat; }
 
-  void OnContextMenuItemCallback(int id);
   void SetCursorLatLon(double lat, double lon);
 
   // bool MouseEventHook(wxMouseEvent &event);

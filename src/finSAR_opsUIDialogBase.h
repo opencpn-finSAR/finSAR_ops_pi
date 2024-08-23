@@ -51,7 +51,6 @@ class finSAR_opsUIDialogBase : public wxFrame
 		wxTextCtrl* m_textCtrlRouteInUse;
 		wxMenu* m_mHelp;
 		wxMenu* m_mRoutes;
-		wxMenu* m_mExtensions;
 
 		// Virtual event handlers, override them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
@@ -60,11 +59,6 @@ class finSAR_opsUIDialogBase : public wxFrame
 		virtual void OnLoadRoute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnNewRoute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveRoute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnImportRoute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDeleteRoute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveExtensions( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:

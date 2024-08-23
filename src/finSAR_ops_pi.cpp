@@ -250,11 +250,6 @@ void finSAR_ops_pi::OnToolbarToolCallback(int id) {
         new finSAR_opsOverlayFactory(*m_pfinSAR_opsDialog);
     m_pfinSAR_opsOverlayFactory->SetParentSize(m_display_width,
                                                 m_display_height);
-
-    wxMenu dummy_menu;
-    m_position_menu_id = AddCanvasContextMenuItem(
-        new wxMenuItem(&dummy_menu, -1, _("Activate Waypoint/Leg")), this);
-    SetCanvasContextMenuItemViz(m_position_menu_id, true);
   }
 
   // Qualify the finSAR_ops dialog position
@@ -609,16 +604,6 @@ bool finSAR_ops_pi::SaveConfig(void) {
 
 void finSAR_ops_pi::SetColorScheme(PI_ColorScheme cs) {
   DimeWindow(m_pfinSAR_opsDialog);
-}
-
-void finSAR_ops_pi::OnContextMenuItemCallback(int id) {
-  if (!m_pfinSAR_opsDialog) return;
-
-  if (id == m_position_menu_id) {
-    m_cursor_lat = GetCursorLat();
-    m_cursor_lon = GetCursorLon();
-    m_pfinSAR_opsDialog->OnContextMenu(m_cursor_lat, m_cursor_lon);
-  }
 }
 
 void finSAR_ops_pi::SetCursorLatLon(double lat, double lon) {
