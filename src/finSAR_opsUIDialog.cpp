@@ -216,7 +216,7 @@ int finSAR_opsUIDialog::GetRandomNumber(int range_min, int range_max) {
 }
 
 void finSAR_opsUIDialog::SaveIndexRangeDirection(wxString route_name,
-                                                  wxString date_stamp) {
+                                                 wxString date_stamp) {
   // Create Main level XML container
   xml_document xmlDoc;
 
@@ -1893,7 +1893,7 @@ int finSAR_opsUIDialog::DeleteChartedRoute() {
 }
 
 double finSAR_opsUIDialog::FindDistanceFromLeg(Position* A, Position* B,
-                                                Position* C) {
+                                               Position* C) {
   double value = 0.0;
   A->lat.ToDouble(&value);
   double lat1 = value;
@@ -1956,6 +1956,30 @@ void finSAR_opsUIDialog::MakeEBLEvent() {
     ebl_lon = pPlugIn->GetCursorLon();
     m_ShipLat2 = pPlugIn->m_ship_lat;
     m_ShipLon2 = pPlugIn->m_ship_lon;
+
+    double dist, brg;
+    DistanceBearingMercator_Plugin(ebl_lat, ebl_lon, m_ShipLat2, m_ShipLon2,
+                                   &brg, &dist);
+
+    wxString brgs = wxString::Format("%3.0f", brg);
+    if (brg < 10.0) {
+      std::string s = brgs;
+      string r = s.substr(2, 1);
+      unsigned int number_of_zeros = 3 - r.length();  // add 1 zero
+
+      r.insert(0, number_of_zeros, '0');
+      brgs = r;
+    } else if (brg >= 10 && brg < 100) {
+      std::string s = brgs;
+      string r = s.substr(1, 2);
+      unsigned int number_of_zeros = 3 - r.length();  // add 1 zero
+
+      r.insert(0, number_of_zeros, '0');
+      brgs = r; 
+    }
+
+    this->m_EBLbearing->SetValue(brgs);
+
   } else {
     ebl_lat = 0;
     ebl_lon = 0;

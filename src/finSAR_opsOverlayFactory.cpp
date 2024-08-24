@@ -204,6 +204,14 @@ void finSAR_opsOverlayFactory::DrawEBLLineInViewPort(PlugIn_ViewPort *BBox) {
 
   if (m_dc) {
     m_dc->DrawLine(s.x, s.y, ebl.x, ebl.y, false);
+
+   double angle = atan2(ebl.y - s.y, ebl.x - s.x);
+    // Add the two lines for the arrowhead
+   m_dc->DrawLine(ebl.x, ebl.y, ebl.x - 10 * cos(angle - PI / 7),
+                  ebl.y - 10 * sin(angle - PI / 7));
+   m_dc->DrawLine(ebl.x, ebl.y, ebl.x - 10 * cos(angle + PI / 7),
+                  ebl.y - 10 * sin(angle + PI / 7));
+
   }
 }
 
