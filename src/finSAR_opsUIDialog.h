@@ -381,7 +381,6 @@ private:
   void OnDeleteRoute(wxCommandEvent& event);
   void DeleteRTZFile(wxString route_name);
   void DeleteEXTFile(wxString route_name);
-  void OnLoadExtensions(wxCommandEvent& event);
   void OnSaveExtensions(wxCommandEvent& event);
   void OnIndex(wxCommandEvent& event);
   void SaveIndexRangeDirection(wxString route_name, wxString date_stamp);
@@ -393,6 +392,10 @@ private:
   void OnDirection(wxCommandEvent& event);
   void GetDirection(Position* A, Position* B);
   void OnDirectionDelete(wxCommandEvent& event);
+  void OnTimer(wxTimerEvent& event);
+  void MakeEBLEvent(); 
+  void OnButtonEBL(wxCommandEvent& event);
+  void OnButtonEBL_off(wxCommandEvent& event);
 };
 
 class GetRouteDialog : public wxDialog {

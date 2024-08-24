@@ -27,6 +27,7 @@
 #include <wx/panel.h>
 #include <wx/notebook.h>
 #include <wx/menu.h>
+#include <wx/timer.h>
 #include <wx/frame.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -49,20 +50,32 @@ class finSAR_opsUIDialogBase : public wxFrame
 		wxChoice* m_choice21;
 		wxButton* m_bLoadRoute;
 		wxTextCtrl* m_textCtrlRouteInUse;
+		wxButton* m_bButtonBearing1;
+		wxButton* m_button8;
+		wxStaticText* m_staticText6;
+		wxStaticText* m_staticText7;
+		wxStaticText* m_staticText8;
 		wxMenu* m_mHelp;
 		wxMenu* m_mRoutes;
+		wxTimer m_timer1;
 
 		// Virtual event handlers, override them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void key_shortcut( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnLoadRoute( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnButtonEBL( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnButtonEBL_off( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTimer( wxTimerEvent& event ) { event.Skip(); }
 
 
 	public:
 		wxChoice* m_choiceRoutes;
+		wxTextCtrl* m_Lat1;
+		wxTextCtrl* m_Lon1;
+		wxTextCtrl* m_EBLbearing;
 		wxMenuBar* m_menubar3;
 
 		finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("finSAR_ops"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 377,839 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );

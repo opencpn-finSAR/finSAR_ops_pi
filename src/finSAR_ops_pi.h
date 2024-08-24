@@ -81,7 +81,6 @@ public:
   bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
   bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
   // void SetCursorLatLon(double lat, double lon);
-  void SetPositionFix(PlugIn_Position_Fix &pfix);
   void SetDefaults(void);
   int GetToolbarToolCount(void);
   void OnToolbarToolCallback(int id);
@@ -150,8 +149,13 @@ public:
   void FillRouteNamesDropdown();
   wxArrayString GetRouteList();
 
+  double m_ship_lon, m_ship_lat;
+
+
 private:
   double m_cursor_lat, m_cursor_lon;
+  void SetPositionFix(PlugIn_Position_Fix &pfix);
+
   int m_position_menu_id;
 
   bool LoadConfig(void);
@@ -183,7 +187,6 @@ private:
   int m_table_menu_id;
 
   wxBitmap m_panelBitmap;
-  double m_ship_lon, m_ship_lat;
 
   bool dbQuery(wxString sql);
 };

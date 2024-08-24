@@ -95,6 +95,7 @@ private:
   wxBitmap m_bmp;
   wxImage &DrawLabel(double value, int precision);
   void DrawWptDisk(PlugIn_ViewPort *BBox);
+  void DrawEBLLineInViewPort(PlugIn_ViewPort *BBox);
   void DrawIndexTargets(PlugIn_ViewPort *BBox);
   void DrawRangeTargets(PlugIn_ViewPort *BBox);
 

@@ -1930,3 +1930,39 @@ double finSAR_opsUIDialog::FindDistanceFromLeg(Position* A, Position* B,
 
   return distance;
 }
+
+void finSAR_opsUIDialog::OnButtonEBL(wxCommandEvent& event) {
+  m_bBearingLine = true;
+
+  this->m_timer1.Start(200);
+}
+
+void finSAR_opsUIDialog::OnButtonEBL_off(wxCommandEvent& event) {
+  m_bBearingLine = false;
+
+  this->m_timer1.Stop();
+
+  RequestRefresh(pParent);
+}
+
+void finSAR_opsUIDialog::OnTimer(wxTimerEvent& event) { MakeEBLEvent(); }
+
+void finSAR_opsUIDialog::MakeEBLEvent() {
+  if (m_bBearingLine) {
+    this->m_Lat1->SetValue(wxString::Format("%.6f", pPlugIn->GetCursorLat()));
+    this->m_Lon1->SetValue(wxString::Format("%.6f", pPlugIn->GetCursorLon()));
+
+    ebl_lat = pPlugIn->GetCursorLat();
+    ebl_lon = pPlugIn->GetCursorLon();
+    m_ShipLat2 = pPlugIn->m_ship_lat;
+    m_ShipLon2 = pPlugIn->m_ship_lon;
+  } else {
+    ebl_lat = 0;
+    ebl_lon = 0;
+
+    m_ShipLat2 = 0;
+    m_ShipLat2 = 0;
+  }
+
+  RequestRefresh(pParent);
+}

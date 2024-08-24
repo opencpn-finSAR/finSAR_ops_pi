@@ -99,6 +99,47 @@ finSAR_opsUIDialogBase::finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id,
 
 	bSizer9->Add( bSizer10, 1, wxEXPAND, 5 );
 
+	wxBoxSizer* bSizer11;
+	bSizer11 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_bButtonBearing1 = new wxButton( m_panelRoutes, wxID_ANY, _("EBL"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer11->Add( m_bButtonBearing1, 0, wxALL, 5 );
+
+	m_button8 = new wxButton( m_panelRoutes, wxID_ANY, _("EBL Off"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer11->Add( m_button8, 0, wxALL, 5 );
+
+
+	bSizer9->Add( bSizer11, 0, wxEXPAND, 5 );
+
+	wxFlexGridSizer* fgSizer3;
+	fgSizer3 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer3->SetFlexibleDirection( wxBOTH );
+	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_staticText6 = new wxStaticText( m_panelRoutes, wxID_ANY, _("EBL Latitude"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText6->Wrap( -1 );
+	fgSizer3->Add( m_staticText6, 0, wxALL, 5 );
+
+	m_Lat1 = new wxTextCtrl( m_panelRoutes, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer3->Add( m_Lat1, 0, wxALL, 5 );
+
+	m_staticText7 = new wxStaticText( m_panelRoutes, wxID_ANY, _("EBL Longitude"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText7->Wrap( -1 );
+	fgSizer3->Add( m_staticText7, 0, wxALL, 5 );
+
+	m_Lon1 = new wxTextCtrl( m_panelRoutes, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer3->Add( m_Lon1, 0, wxALL, 5 );
+
+	m_staticText8 = new wxStaticText( m_panelRoutes, wxID_ANY, _("Bearing"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText8->Wrap( -1 );
+	fgSizer3->Add( m_staticText8, 0, wxALL, 5 );
+
+	m_EBLbearing = new wxTextCtrl( m_panelRoutes, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer3->Add( m_EBLbearing, 0, wxALL, 5 );
+
+
+	bSizer9->Add( fgSizer3, 0, wxEXPAND, 5 );
+
 
 	m_panelRoutes->SetSizer( bSizer9 );
 	m_panelRoutes->Layout();
@@ -134,6 +175,7 @@ finSAR_opsUIDialogBase::finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id,
 
 	this->SetMenuBar( m_menubar3 );
 
+	m_timer1.SetOwner( this, m_timer1.GetId() );
 
 	this->Centre( wxBOTH );
 
@@ -142,9 +184,12 @@ finSAR_opsUIDialogBase::finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id,
 	this->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( finSAR_opsUIDialogBase::key_shortcut ) );
 	this->Connect( wxEVT_SIZE, wxSizeEventHandler( finSAR_opsUIDialogBase::OnSize ) );
 	m_bLoadRoute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), NULL, this );
+	m_bButtonBearing1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL ), NULL, this );
+	m_button8->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL_off ), NULL, this );
 	m_mHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnInformation ), this, m_mInformation->GetId());
 	m_mHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnAbout ), this, m_mAbout->GetId());
 	m_mRoutes->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), this, m_mLoadRoute->GetId());
+	this->Connect( m_timer1.GetId(), wxEVT_TIMER, wxTimerEventHandler( finSAR_opsUIDialogBase::OnTimer ) );
 }
 
 finSAR_opsUIDialogBase::~finSAR_opsUIDialogBase()
@@ -154,5 +199,8 @@ finSAR_opsUIDialogBase::~finSAR_opsUIDialogBase()
 	this->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( finSAR_opsUIDialogBase::key_shortcut ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( finSAR_opsUIDialogBase::OnSize ) );
 	m_bLoadRoute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), NULL, this );
+	m_bButtonBearing1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL ), NULL, this );
+	m_button8->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL_off ), NULL, this );
+	this->Disconnect( m_timer1.GetId(), wxEVT_TIMER, wxTimerEventHandler( finSAR_opsUIDialogBase::OnTimer ) );
 
 }

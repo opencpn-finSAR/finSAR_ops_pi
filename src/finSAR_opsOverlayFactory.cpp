@@ -148,6 +148,11 @@ bool finSAR_opsOverlayFactory::RenderOverlay(piDC &dc, PlugIn_ViewPort &vp) {
 
   if (m_dlg.m_bDrawWptDisk) DrawWptDisk(&vp);
 
+  if (m_dlg.m_bBearingLine) {
+    DrawEBLLineInViewPort(&vp);
+  } 
+
+
   return true;
 }
 
@@ -177,6 +182,28 @@ void finSAR_opsOverlayFactory::DrawWptDisk(PlugIn_ViewPort *BBox) {
     brush2.SetStyle(wxBRUSHSTYLE_SOLID);
     m_dc->SetBrush(brush2);
     m_dc->DrawDisk(wpc.x, wpc.y, 10, 15);
+  }
+}
+
+void finSAR_opsOverlayFactory::DrawEBLLineInViewPort(PlugIn_ViewPort *BBox) {
+  wxColour colour = wxColour("RED");
+  wxBrush brush(colour);
+  c_GLcolour = colour;  // for filling GL arrows
+  if (m_dc) {
+    wxPen pen(colour, 2);
+
+    m_dc->SetPen(pen);
+    brush.SetStyle(wxBRUSHSTYLE_SOLID);
+    m_dc->SetBrush(brush);
+  }
+
+  wxPoint ebl;
+  GetCanvasPixLL(BBox, &ebl, m_dlg.ebl_lat, m_dlg.ebl_lon);
+  wxPoint s;
+  GetCanvasPixLL(BBox, &s, m_dlg.m_ShipLat2, m_dlg.m_ShipLon2);
+
+  if (m_dc) {
+    m_dc->DrawLine(s.x, s.y, ebl.x, ebl.y, false);
   }
 }
 
