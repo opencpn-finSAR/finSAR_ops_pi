@@ -150,8 +150,7 @@ bool finSAR_opsOverlayFactory::RenderOverlay(piDC &dc, PlugIn_ViewPort &vp) {
 
   if (m_dlg.m_bBearingLine) {
     DrawEBLLineInViewPort(&vp);
-  } 
-
+  }
 
   return true;
 }
@@ -205,13 +204,31 @@ void finSAR_opsOverlayFactory::DrawEBLLineInViewPort(PlugIn_ViewPort *BBox) {
   if (m_dc) {
     m_dc->DrawLine(s.x, s.y, ebl.x, ebl.y, false);
 
-   double angle = atan2(ebl.y - s.y, ebl.x - s.x);
+    double angle = atan2(ebl.y - s.y, ebl.x - s.x);
     // Add the two lines for the arrowhead
-   m_dc->DrawLine(ebl.x, ebl.y, ebl.x - 10 * cos(angle - PI / 7),
-                  ebl.y - 10 * sin(angle - PI / 7));
-   m_dc->DrawLine(ebl.x, ebl.y, ebl.x - 10 * cos(angle + PI / 7),
-                  ebl.y - 10 * sin(angle + PI / 7));
+    m_dc->DrawLine(ebl.x, ebl.y, ebl.x - 10 * cos(angle - PI / 7),
+                   ebl.y - 10 * sin(angle - PI / 7));
+    m_dc->DrawLine(ebl.x, ebl.y, ebl.x - 10 * cos(angle + PI / 7),
+                   ebl.y - 10 * sin(angle + PI / 7));
 
+    wxString bearing_angle = m_dlg.brgs;
+
+    wxImage image = DrawLabelEBL(m_dlg.ebl_brg, 1);
+    wxCoord w = image.GetWidth();
+    wxCoord h = image.GetHeight();
+
+    wxBitmap bm(image);
+    m_dc->DrawBitmap(bm, ebl.x + 10, ebl.y, true);
+
+    wxColour colour2 = wxColour("WHITE");
+;
+    wxPen pen2(colour2, 2);
+
+    wxFont font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+    m_dc->SetFont(font);
+    m_dc->SetTextForeground("WHITE");
+    m_dc->SetPen(pen2);
+    m_dc->DrawText(bearing_angle, ebl.x + 15, ebl.y + 6);
   }
 }
 
@@ -529,8 +546,88 @@ wxImage &finSAR_opsOverlayFactory::DrawLabel(double value, int precision) {
   return image;
 }
 
+wxImage &finSAR_opsOverlayFactory::DrawLabelEBL(double value, int precision) {
+  wxString labels;
+
+  int p = precision;
+
+  value *= 100;
+
+  labels = wxString::Format("%3.0f", value);
+  labels = " " + labels + " ";
+
+  if (value < 0.01) {
+    labels = " " + labels;
+  }
+  // labels.Printf("%.*f", p, value);
+
+  wxMemoryDC mdc(wxNullBitmap);
+
+  wxFont font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+  mdc.SetFont(font);
+
+  wxCoord w, h;
+  mdc.GetTextExtent(labels, &w, &h);
+
+  wxBitmap bm(w * 2, w * 2);
+
+  mdc.SelectObject(bm);
+  mdc.Clear();
+
+  wxColour disk_color = wxColour("BLACK");
+  wxColour text_color = wxColour("WHITE");
+
+  mdc.SetBackground(*wxTRANSPARENT_BRUSH);
+  mdc.SetBrush(disk_color);
+
+  wxCoord r = w / 2 - w / 200 - 1;
+
+  mdc.DrawRoundedRectangle(5, 5, w, h, 5);
+
+  //
+  // Now drawing in DrawIndexTargets to avoid transparency of text
+  //
+
+  // mdc.SetTextForeground(text_color);
+  // mdc.SetPen(text_color);
+
+  int xd = 0;
+  int yd = w / 2;
+
+  // mdc.DrawText(labels, xd, yd - 12);
+  mdc.SelectObject(wxNullBitmap);
+
+  m_labelCache[value] = bm.ConvertToImage();
+
+  // Setup the alpha channel.
+  unsigned char *alphaData = new unsigned char[bm.GetWidth() * bm.GetHeight()];
+  memset(alphaData, wxIMAGE_ALPHA_TRANSPARENT, bm.GetWidth() * bm.GetHeight());
+
+  // Create an image with alpha.
+  m_labelCache[value].SetAlpha(alphaData);
+
+  wxImage &image = m_labelCache[value];
+
+  unsigned char *d = image.GetData();
+  unsigned char *a = image.GetAlpha();
+
+  w = image.GetWidth(), h = image.GetHeight();
+  for (int y = 0; y < h; y++)
+    for (int x = 0; x < w; x++) {
+      int r, g, b;
+      int ioff = (y * w + x);
+      r = d[ioff * 3 + 0];
+      g = d[ioff * 3 + 1];
+      b = d[ioff * 3 + 2];
+
+      a[ioff] = 255 - (r + g + b) / 3;
+    }
+
+  return image;
+}
+
 wxImage finSAR_opsOverlayFactory::DrawDirectionArrows(int x, int y,
-                                                       double scale) {
+                                                      double scale) {
   wxMemoryDC mdc(wxNullBitmap);
 
   wxFont font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
@@ -715,8 +812,8 @@ wxImage finSAR_opsOverlayFactory::DrawDirectionArrows(int x, int y,
 }
 
 wxImage finSAR_opsOverlayFactory::DrawDirectionLabels(double value, int x,
-                                                       int y, double scale,
-                                                       bool reverse) {
+                                                      int y, double scale,
+                                                      bool reverse) {
   wxMemoryDC mdc(wxNullBitmap);
 
   wxString direction_brg = wxString::Format("%3.0f", value);

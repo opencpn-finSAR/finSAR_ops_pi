@@ -318,6 +318,8 @@ public:
 
   wxString m_dateStamp;
   wxWindow* pParent;
+  wxString brgs;
+  double ebl_brg;
 
 protected:
 private:

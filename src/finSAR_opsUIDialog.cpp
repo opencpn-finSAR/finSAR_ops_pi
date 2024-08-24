@@ -1957,19 +1957,19 @@ void finSAR_opsUIDialog::MakeEBLEvent() {
     m_ShipLat2 = pPlugIn->m_ship_lat;
     m_ShipLon2 = pPlugIn->m_ship_lon;
 
-    double dist, brg;
+    double dist;
     DistanceBearingMercator_Plugin(ebl_lat, ebl_lon, m_ShipLat2, m_ShipLon2,
-                                   &brg, &dist);
+                                   &ebl_brg, &dist);
 
-    wxString brgs = wxString::Format("%3.0f", brg);
-    if (brg < 10.0) {
+    brgs = wxString::Format("%3.0f", ebl_brg);
+    if (ebl_brg < 10.0) {
       std::string s = brgs;
       string r = s.substr(2, 1);
       unsigned int number_of_zeros = 3 - r.length();  // add 1 zero
 
       r.insert(0, number_of_zeros, '0');
       brgs = r;
-    } else if (brg >= 10 && brg < 100) {
+    } else if (ebl_brg >= 10 && ebl_brg < 100) {
       std::string s = brgs;
       string r = s.substr(1, 2);
       unsigned int number_of_zeros = 3 - r.length();  // add 1 zero
