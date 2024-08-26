@@ -138,7 +138,7 @@ bool finSAR_opsOverlayFactory::RenderOverlay(piDC &dc, PlugIn_ViewPort &vp) {
               wxFONTWEIGHT_NORMAL);
   m_dc->SetFont(font);
 
-  DrawAllLinesInViewPort(&vp);  // The cross-hairs
+  //DrawAllLinesInViewPort(&vp);  // The cross-hairs (not needed for ops?)
 
   DrawIndexTargets(&vp);
 

@@ -42,6 +42,8 @@
 #include "pidc.h"
 #include <wx/tokenzr.h>
 #include <wx/datetime.h>
+#include "miniOpsFrame.h"
+
 
 #define DATABASE_NAME "finSAR.db"
 

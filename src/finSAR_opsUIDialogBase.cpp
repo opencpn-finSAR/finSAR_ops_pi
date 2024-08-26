@@ -140,6 +140,15 @@ finSAR_opsUIDialogBase::finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id,
 
 	bSizer9->Add( fgSizer3, 0, wxEXPAND, 5 );
 
+	wxBoxSizer* bSizer111;
+	bSizer111 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_bButtonIconize = new wxButton( m_panelRoutes, wxID_ANY, _("Remote ON"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer111->Add( m_bButtonIconize, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxEXPAND, 5 );
+
+
+	bSizer9->Add( bSizer111, 0, wxEXPAND, 5 );
+
 
 	m_panelRoutes->SetSizer( bSizer9 );
 	m_panelRoutes->Layout();
@@ -186,6 +195,7 @@ finSAR_opsUIDialogBase::finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id,
 	m_bLoadRoute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), NULL, this );
 	m_bButtonBearing1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL ), NULL, this );
 	m_button8->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL_off ), NULL, this );
+	m_bButtonIconize->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonRemoteOn ), NULL, this );
 	m_mHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnInformation ), this, m_mInformation->GetId());
 	m_mHelp->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnAbout ), this, m_mAbout->GetId());
 	m_mRoutes->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), this, m_mLoadRoute->GetId());
@@ -201,6 +211,7 @@ finSAR_opsUIDialogBase::~finSAR_opsUIDialogBase()
 	m_bLoadRoute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnLoadRoute ), NULL, this );
 	m_bButtonBearing1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL ), NULL, this );
 	m_button8->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonEBL_off ), NULL, this );
+	m_bButtonIconize->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( finSAR_opsUIDialogBase::OnButtonRemoteOn ), NULL, this );
 	this->Disconnect( m_timer1.GetId(), wxEVT_TIMER, wxTimerEventHandler( finSAR_opsUIDialogBase::OnTimer ) );
 
 }

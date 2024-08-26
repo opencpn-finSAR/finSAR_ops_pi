@@ -51,6 +51,7 @@
 #include "pugixml.hpp"
 
 class Position;
+class finSAR_opsUIDialog;
 
 using namespace std;
 using namespace pugi;
@@ -1975,7 +1976,7 @@ void finSAR_opsUIDialog::MakeEBLEvent() {
       unsigned int number_of_zeros = 3 - r.length();  // add 1 zero
 
       r.insert(0, number_of_zeros, '0');
-      brgs = r; 
+      brgs = r;
     }
 
     this->m_EBLbearing->SetValue(brgs);
@@ -1990,3 +1991,17 @@ void finSAR_opsUIDialog::MakeEBLEvent() {
 
   RequestRefresh(pParent);
 }
+
+void finSAR_opsUIDialog::OnButtonRemoteOn(wxCommandEvent& event) {
+  MyMiniFrame = new miniOpsFrame(
+      this, -1, "finSAR Operations", wxPoint(200, 200), wxSize(300, 200),
+      wxCAPTION | wxRESIZE_BORDER | wxCLOSE_BOX | wxSTAY_ON_TOP);
+
+  MyMiniFrame->parentFrame = pPlugIn->m_pfinSAR_opsDialog;
+
+  this->Iconize(true);
+
+  MyMiniFrame->Show();
+}
+
+void finSAR_opsUIDialog::OnRemoteOff() { this->Iconize(false); }

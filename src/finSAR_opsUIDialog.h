@@ -133,7 +133,7 @@ static const long long lNaN = 0xfff8000000000000;
 class finSAR_opsOverlayFactory;
 class PlugIn_ViewPort;
 class PositionRecordSet;
-
+class miniOpsFrame;
 class wxFileConfig;
 class finSAR_ops_pi;
 class wxGraphicsContext;
@@ -141,6 +141,7 @@ class routeprop;
 class IndexTarget;
 class DirectionTarget;
 class RangeTarget;
+
 
 class IndexTarget {
 public:
@@ -320,6 +321,8 @@ public:
   wxWindow* pParent;
   wxString brgs;
   double ebl_brg;
+  miniOpsFrame* MyMiniFrame;
+  void OnRemoteOff();
 
 protected:
 private:
@@ -398,6 +401,7 @@ private:
   void MakeEBLEvent(); 
   void OnButtonEBL(wxCommandEvent& event);
   void OnButtonEBL_off(wxCommandEvent& event);
+  void OnButtonRemoteOn(wxCommandEvent& event);
 };
 
 class GetRouteDialog : public wxDialog {
@@ -420,5 +424,7 @@ public:
 protected:
 private:
 };
+
+
 
 #endif
