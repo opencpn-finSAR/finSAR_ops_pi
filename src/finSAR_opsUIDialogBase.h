@@ -29,6 +29,8 @@
 #include <wx/menu.h>
 #include <wx/timer.h>
 #include <wx/frame.h>
+#include <wx/clrpicker.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -83,6 +85,39 @@ class finSAR_opsUIDialogBase : public wxFrame
 		finSAR_opsUIDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("finSAR_ops"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 377,839 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxMINIMIZE_BOX|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 
 		~finSAR_opsUIDialogBase();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class finSAR_opsPreferences
+///////////////////////////////////////////////////////////////////////////////
+class finSAR_opsPreferences : public wxDialog
+{
+	private:
+
+	protected:
+		wxNotebook* m_notebook3;
+		wxPanel* m_panel2;
+		wxStaticText* m_staticText12;
+		wxChoice* m_choice5;
+		wxStaticText* m_staticText17;
+		wxStaticText* m_staticText18;
+		wxStaticText* m_staticText19;
+		wxStaticText* m_staticText32;
+		wxChoice* m_choice10;
+		wxPanel* m_panel3;
+		wxStdDialogButtonSizer* m_sdbSizerButtons;
+		wxButton* m_sdbSizerButtonsOK;
+		wxButton* m_sdbSizerButtonsCancel;
+
+	public:
+		wxTextCtrl* HDTPredictorMiles;
+		wxTextCtrl* HDTPredictorWidth;
+		wxColourPickerCtrl* myColourPicker;
+
+		finSAR_opsPreferences( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("finSAR Operations Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxRESIZE_BORDER );
+
+		~finSAR_opsPreferences();
 
 };
 

@@ -142,7 +142,6 @@ class IndexTarget;
 class DirectionTarget;
 class RangeTarget;
 
-
 class IndexTarget {
 public:
   wxString route_name;
@@ -324,6 +323,10 @@ public:
   miniOpsFrame* MyMiniFrame;
   void OnRemoteOff();
 
+  wxString m_useHeadingLineLength;
+  wxString m_useHeadingLineThickness;
+  wxString m_useLineColour;
+
 protected:
 private:
   double myDist;
@@ -398,7 +401,7 @@ private:
   void GetDirection(Position* A, Position* B);
   void OnDirectionDelete(wxCommandEvent& event);
   void OnTimer(wxTimerEvent& event);
-  void MakeEBLEvent(); 
+  void MakeEBLEvent();
   void OnButtonEBL(wxCommandEvent& event);
   void OnButtonEBL_off(wxCommandEvent& event);
   void OnButtonRemoteOn(wxCommandEvent& event);
@@ -424,7 +427,5 @@ public:
 protected:
 private:
 };
-
-
 
 #endif

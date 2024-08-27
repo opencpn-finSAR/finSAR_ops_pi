@@ -215,3 +215,126 @@ finSAR_opsUIDialogBase::~finSAR_opsUIDialogBase()
 	this->Disconnect( m_timer1.GetId(), wxEVT_TIMER, wxTimerEventHandler( finSAR_opsUIDialogBase::OnTimer ) );
 
 }
+
+finSAR_opsPreferences::finSAR_opsPreferences( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
+
+	wxFlexGridSizer* fgSizer5;
+	fgSizer5 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer5->SetFlexibleDirection( wxBOTH );
+	fgSizer5->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	wxBoxSizer* bSizer13;
+	bSizer13 = new wxBoxSizer( wxVERTICAL );
+
+	m_notebook3 = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panel2 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer14;
+	bSizer14 = new wxBoxSizer( wxVERTICAL );
+
+	wxBoxSizer* bSizer21;
+	bSizer21 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_staticText12 = new wxStaticText( m_panel2, wxID_ANY, _("Length"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12->Wrap( -1 );
+	bSizer21->Add( m_staticText12, 0, wxALL, 5 );
+
+	HDTPredictorMiles = new wxTextCtrl( m_panel2, wxID_ANY, _("1"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer21->Add( HDTPredictorMiles, 0, wxALL, 5 );
+
+	wxString m_choice5Choices[] = { _("Nautical Miles"), _("Meters") };
+	int m_choice5NChoices = sizeof( m_choice5Choices ) / sizeof( wxString );
+	m_choice5 = new wxChoice( m_panel2, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice5NChoices, m_choice5Choices, 0 );
+	m_choice5->SetSelection( 0 );
+	bSizer21->Add( m_choice5, 0, wxALL, 5 );
+
+
+	bSizer14->Add( bSizer21, 1, wxEXPAND, 5 );
+
+	wxBoxSizer* bSizer22;
+	bSizer22 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_staticText17 = new wxStaticText( m_panel2, wxID_ANY, _("Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText17->Wrap( -1 );
+	bSizer22->Add( m_staticText17, 0, wxALL, 5 );
+
+	HDTPredictorWidth = new wxTextCtrl( m_panel2, wxID_ANY, _("2"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer22->Add( HDTPredictorWidth, 0, wxALL, 5 );
+
+	m_staticText18 = new wxStaticText( m_panel2, wxID_ANY, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText18->Wrap( -1 );
+	bSizer22->Add( m_staticText18, 0, wxALL, 5 );
+
+
+	bSizer14->Add( bSizer22, 1, wxEXPAND, 5 );
+
+	wxBoxSizer* bSizer23;
+	bSizer23 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_staticText19 = new wxStaticText( m_panel2, wxID_ANY, _("Colour"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText19->Wrap( -1 );
+	bSizer23->Add( m_staticText19, 0, wxALL, 5 );
+
+	myColourPicker = new wxColourPickerCtrl( m_panel2, wxID_ANY, wxColour( 255, 0, 0 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	bSizer23->Add( myColourPicker, 0, wxALL, 5 );
+
+
+	bSizer14->Add( bSizer23, 1, wxEXPAND, 5 );
+
+	wxBoxSizer* bSizer30;
+	bSizer30 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_staticText32 = new wxStaticText( m_panel2, wxID_ANY, _("Style       "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText32->Wrap( -1 );
+	bSizer30->Add( m_staticText32, 0, wxALL, 5 );
+
+	wxString m_choice10Choices[] = { _("Solid"), _("Dashed") };
+	int m_choice10NChoices = sizeof( m_choice10Choices ) / sizeof( wxString );
+	m_choice10 = new wxChoice( m_panel2, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice10NChoices, m_choice10Choices, 0 );
+	m_choice10->SetSelection( 0 );
+	bSizer30->Add( m_choice10, 0, wxALL, 5 );
+
+
+	bSizer14->Add( bSizer30, 1, wxEXPAND, 5 );
+
+
+	m_panel2->SetSizer( bSizer14 );
+	m_panel2->Layout();
+	bSizer14->Fit( m_panel2 );
+	m_notebook3->AddPage( m_panel2, _("HeadingLine"), true );
+	m_panel3 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer19;
+	bSizer19 = new wxBoxSizer( wxVERTICAL );
+
+
+	m_panel3->SetSizer( bSizer19 );
+	m_panel3->Layout();
+	bSizer19->Fit( m_panel3 );
+	m_notebook3->AddPage( m_panel3, _("COG Prediction"), false );
+
+	bSizer13->Add( m_notebook3, 1, wxEXPAND | wxALL, 5 );
+
+	m_sdbSizerButtons = new wxStdDialogButtonSizer();
+	m_sdbSizerButtonsOK = new wxButton( this, wxID_OK );
+	m_sdbSizerButtons->AddButton( m_sdbSizerButtonsOK );
+	m_sdbSizerButtonsCancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizerButtons->AddButton( m_sdbSizerButtonsCancel );
+	m_sdbSizerButtons->Realize();
+
+	bSizer13->Add( m_sdbSizerButtons, 0, wxEXPAND, 5 );
+
+
+	fgSizer5->Add( bSizer13, 1, wxEXPAND, 5 );
+
+
+	this->SetSizer( fgSizer5 );
+	this->Layout();
+	fgSizer5->Fit( this );
+
+	this->Centre( wxBOTH );
+}
+
+finSAR_opsPreferences::~finSAR_opsPreferences()
+{
+}

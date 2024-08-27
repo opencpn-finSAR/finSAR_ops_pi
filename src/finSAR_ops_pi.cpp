@@ -181,8 +181,8 @@ int finSAR_ops_pi::Init(void) {
         finSAR_ops_TOOL_POSITION, 0, this);
 #else
     m_leftclick_tool_id = InsertPlugInTool(
-        _T(""), _img_finSAR_ops, _img_finSAR_ops, wxITEM_CHECK,
-        _("finSAR_ops"), _T(""), NULL, finSAR_ops_TOOL_POSITION, 0, this);
+        _T(""), _img_finSAR_ops, _img_finSAR_ops, wxITEM_CHECK, _("finSAR_ops"),
+        _T(""), NULL, finSAR_ops_TOOL_POSITION, 0, this);
 #endif
 
   return (WANTS_OVERLAY_CALLBACK | WANTS_OPENGL_OVERLAY_CALLBACK |
@@ -250,7 +250,7 @@ void finSAR_ops_pi::OnToolbarToolCallback(int id) {
     m_pfinSAR_opsOverlayFactory =
         new finSAR_opsOverlayFactory(*m_pfinSAR_opsDialog);
     m_pfinSAR_opsOverlayFactory->SetParentSize(m_display_width,
-                                                m_display_height);
+                                               m_display_height);
   }
 
   // Qualify the finSAR_ops dialog position
@@ -404,7 +404,7 @@ void finSAR_ops_pi::DeleteEXT_Name(wxString route_name) {
 }
 
 int finSAR_ops_pi::Add_EXT_db(wxString extensions_file, wxString route_name,
-                               wxString rtz_date_stamp) {
+                              wxString rtz_date_stamp) {
   wxString sql = wxString::Format(
       "INSERT INTO EXT (extensions_file, route_name, rtz_date_stamp, created, "
       "submitted) "
@@ -444,7 +444,7 @@ int finSAR_ops_pi::dbGetIntNotNullValue(wxString sql) {
 }
 
 void finSAR_ops_pi::dbGetTable(wxString sql, char ***results, int &n_rows,
-                                int &n_columns) {
+                               int &n_columns) {
   ret = sqlite3_get_table(m_database, sql.mb_str(), results, &n_rows,
                           &n_columns, &err_msg);
   // wxMessageBox(err_msg);
@@ -536,7 +536,7 @@ bool finSAR_ops_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp) {
 }
 
 bool finSAR_ops_pi::RenderGLOverlay(wxGLContext *pcontext,
-                                     PlugIn_ViewPort *vp) {
+                                    PlugIn_ViewPort *vp) {
   if (!m_pfinSAR_opsDialog || !m_pfinSAR_opsDialog->IsShown() ||
       !m_pfinSAR_opsOverlayFactory)
     return false;
@@ -560,23 +560,54 @@ void finSAR_ops_pi::SetPositionFix(PlugIn_Position_Fix &pfix) {
   // std::cout<<"Ship--> Lat: "<<m_ship_lat<<" Lon: "<<m_ship_lon<<std::endl;
   //}
 }
+
+void finSAR_ops_pi::ShowPreferencesDialog(wxWindow *parent) {
+  finSAR_opsPreferences *Pref = new finSAR_opsPreferences(parent);
+
+  Pref->HDTPredictorMiles->SetValue(
+      wxString::Format("%f", g_ownship_HDTpredictor_miles));
+  Pref->HDTPredictorWidth->SetValue(CopyHeadingLineWidth);
+
+  wxColour myC0 = wxColour(myLineColour);
+  Pref->myColourPicker->SetColour(myC0);
+
+  if (Pref->ShowModal() == wxID_OK) {
+    // bool copyFillColour = true;
+
+    myLineColour = Pref->myColourPicker->GetColour().GetAsString();
+
+    wxString miles = Pref->HDTPredictorMiles->GetValue();
+    double copyMiles;
+    miles.ToDouble(&copyMiles);
+
+    wxString copyWidth = Pref->HDTPredictorWidth->GetValue();
+
+    if (g_ownship_HDTpredictor_miles != copyMiles) {
+      g_ownship_HDTpredictor_miles = copyMiles;
+      //wxMessageBox(wxString::Format("%f", g_ownship_HDTpredictor_miles));
+    }
+
+    if (CopyHeadingLineWidth != copyWidth) {
+      CopyHeadingLineWidth = copyWidth;
+    }
+
+   
+    SaveConfig();
+
+    RequestRefresh(m_parent_window);  // refresh main window
+  }
+}
+
 bool finSAR_ops_pi::LoadConfig(void) {
   wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
 
   if (!pConf) return false;
 
-  pConf->SetPath(_T( "/PlugIns/finSAR_ops" ));
+  pConf->SetPath("/Settings");
 
-  m_CopyFolderSelected = pConf->Read(_T( "finSAR_opsFolder" ));
-
-  if (m_CopyFolderSelected == wxEmptyString) {
-    wxString g_SData_Locn = *GetpSharedDataLocation();
-    // Establish location of Tide and Current data
-    pTC_Dir = new wxString(_T("tcdata"));
-    pTC_Dir->Prepend(g_SData_Locn);
-
-    m_CopyFolderSelected = *pTC_Dir;
-  }
+   pConf->Read("OwnshipHDTPredictorMiles", &g_ownship_HDTpredictor_miles);
+  //wxMessageBox(wxString::Format("%f", g_ownship_HDTpredictor_miles));
+ 
 
   m_finSAR_ops_dialog_sx = pConf->Read(_T( "finSAR_opsDialogSizeX" ), 300L);
   m_finSAR_ops_dialog_sy = pConf->Read(_T( "finSAR_opsDialogSizeY" ), 540L);
@@ -588,12 +619,15 @@ bool finSAR_ops_pi::LoadConfig(void) {
 
 bool finSAR_ops_pi::SaveConfig(void) {
   wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
-
+//wxMessageBox(wxString::Format("%f", CopyHeadingLineMiles));
   if (!pConf) return false;
 
-  pConf->SetPath(_T( "/PlugIns/finSAR_ops" ));
+  pConf->SetPath("/Settings");
 
-  pConf->Write(_T( "finSAR_opsFolder" ), m_CopyFolderSelected);
+  //wxMessageBox("in conf");
+
+  pConf->Write("OwnshipHDTPredictorMiles",
+               wxString::Format("%f", g_ownship_HDTpredictor_miles));
 
   pConf->Write(_T( "finSAR_opsDialogSizeX" ), m_finSAR_ops_dialog_sx);
   pConf->Write(_T( "finSAR_opsDialogSizeY" ), m_finSAR_ops_dialog_sy);

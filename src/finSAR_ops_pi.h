@@ -47,6 +47,8 @@
 
 #define DATABASE_NAME "finSAR.db"
 
+extern wxString myLineColour; 
+
 class piDC;
 class finSAR_opsUIDialog;
 
@@ -160,8 +162,13 @@ private:
 
   int m_position_menu_id;
 
+  void ShowPreferencesDialog(wxWindow *parent);
   bool LoadConfig(void);
   bool SaveConfig(void);
+
+  double g_ownship_HDTpredictor_miles;
+  wxString CopyHeadingLineWidth;
+  wxString myLineColour;
 
   wxFileConfig *m_pconfig;
   wxWindow *m_parent_window;
